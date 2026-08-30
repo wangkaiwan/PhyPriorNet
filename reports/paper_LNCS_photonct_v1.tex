@@ -21,7 +21,7 @@ Prediction on CT (DoseRAD2026 Photon-CT Task)}
 \author{Kai Wang \and Meixu Chen \and Rui Yang}
 \authorrunning{K. Wang et al.}
 \institute{Department of Radiation Oncology, University of Colorado Anschutz Medical Campus,
-Aurora, CO, USA\\ \email{\{kai.2.wang,meixu.chen,ray.yang\}@cuanschutz.edu}}
+Aurora, CO, USA\\ Corresponding author: Kai Wang, \email{kai.2.wang@cuanschutz.edu}}
 
 \maketitle
 
@@ -29,7 +29,7 @@ Aurora, CO, USA\\ \email{\{kai.2.wang,meixu.chen,ray.yang\}@cuanschutz.edu}}
 We predict the Monte-Carlo (MC) dose of every photon MLC control point with an analytical,
 differentiable physics prior followed by a residual 3D U-Net. Six channels (density,
 radiological depth, primary fluence, distance-to-CAX, source distance, and a naive analytical
-dose surrogate are computed per control point from the CT density and the beam descriptor; a
+dose surrogate) are computed per control point from the CT density and the beam descriptor; a
 3D U-Net (dilated bottleneck, Softplus head) learns only the residual to MC. Because the aperture
 enters as a fluence \emph{input}, the model is robust to the benchmark's deliberate shift from
 random training apertures to clinical VMAT test apertures. In ablation, the analytical prior
@@ -332,7 +332,7 @@ through the frozen engine is our next step.
 Investigation, Data curation, Writing -- original draft, Visualization.
 \textbf{Meixu Chen:} Software (deployment and runtime optimization), Investigation
 (acceleration study), Validation, Writing -- review \& editing.
-\textbf{Rui Yang:} Conceptualization, Methodology, Writing -- review \& editing, Supervision.
+\textbf{Rui Yang:} Conceptualization, Methodology, Writing -- review \& editing.
 
 \section{Other Information}
 \textbf{Funding:} No external funding was received for this work.
