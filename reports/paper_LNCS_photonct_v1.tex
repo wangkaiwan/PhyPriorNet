@@ -295,19 +295,37 @@ simultaneously and passes clinically ($\gam$3/3 $=$ 88.8--97.4) while failing 1\
 residual difficulty is geometric (steep dose--anatomy gradients), not modality-specific, and
 argues for cross-validated reporting (Fig.~\ref{fig:qual}).
 
-\textbf{Future work.} Four directions follow directly from our measurements. (i)
-\emph{DVH-aware selection}: our development was gamma-centric, and the DVH clinical score is the
-metric on which our submission ranks weakest relative to its gamma; internalizing the official
-DVH pipeline (structures from public segmentation models) for model selection is
-low-cost and likely worth more than further gamma tuning. (ii) \emph{Student scaling}: base-32
-matched-and-exceeded its teacher; mapping the accuracy--speed frontier over base-24/40 students
-and longer distillation schedules would establish whether another 1.3$\times$ is free. (iii)
-\emph{Multi-modal training as the default}: the $+2.8$ cross-validated gain from joint real/
-synthetic-CT training held on every fold and should be the standard recipe wherever a paired
-MRI task exists. (iv) \emph{Gradient-based planning}: the engine is differentiable down to the
-fluence input, making it a natural physics layer for direct aperture/fluence
+\textbf{Future work.} Within the present methodology, three directions follow directly from our
+measurements. (i) \emph{DVH-aware selection}: our development was gamma-centric, and the DVH
+clinical score is the metric on which our submission ranks weakest relative to its gamma;
+internalizing the official DVH pipeline (structures from public segmentation models) for model
+selection is low-cost and likely worth more than further gamma tuning. (ii) \emph{Student
+scaling and capacity}: base-32 matched and exceeded its teacher; mapping the accuracy--speed
+frontier over base-24/40 students would establish whether another 1.3$\times$ is free. A
+complementary capacity study would overfit individual cases and identify the filter count at
+which single-case $\gam$1/1 saturates above 99\%, demonstrating that the architecture is
+compact yet expressively sufficient. (iii) \emph{Multi-modal training as the default}: the
+$+2.8$ cross-validated gain from joint real/synthetic-CT training held on every fold and should
+be the standard recipe wherever a paired MRI task exists.
+
+Beyond the challenge, the engine's speed and accuracy open clinical applications we intend to
+pursue. (iv) \emph{Dose-aware image matching and adaptive triggering}: at $\sim$0.1\,s per
+control point, dose can be estimated on the image of the day (e.g.\ modern on-board CBCT)
+within the time of a normal image review. Image match today is evaluated geometrically; even
+with the target well aligned, changes in surrounding tissue alter path lengths and distort the
+delivered distribution, and a real-time dose estimate would add the missing dosimetric component
+to the match decision and to adaptive-therapy triggering. (v) \emph{Intrafraction dose
+reconstruction}: combining daily CBCT with low-dimensional deformation bases for soft-tissue
+motion and the recorded motion trace, the engine can reconstruct an estimated delivered dose
+per fraction, identifying systematic error and informing alignment and breathing-gate
+thresholds; a motion-phantom study along these lines is in progress at our institution. (vi)
+\emph{Institutional beam-model tailoring}: refining the analytical prior and the residual
+network on commissioning data for our clinical beam model would tighten the physics prior
+further and is the natural path from challenge model to clinical decision support. (vii)
+\emph{Gradient-based planning}: the engine is differentiable down to the fluence input, making
+it a natural physics layer for direct aperture/fluence
 optimization~\cite{pydosert,achlatis}; a proof-of-concept VMAT segment-weight optimization
-through the frozen engine is our next step outside the challenge.
+through the frozen engine is our next step.
 
 \section{Author Contributions (CRediT)}
 \textbf{Kai Wang:} Conceptualization, Methodology, Software, Validation, Formal analysis,
