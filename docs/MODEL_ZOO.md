@@ -3,10 +3,10 @@
 Two released versions per task: the **highest-quality** model and the **fastest quality-acceptable**
 model. All metrics below are from the DoseRAD2026 preliminary hidden test set (August 2026
 re-scored metrics); runtime is the total per-job time on the challenge evaluation instance.
-Weight bundles are attached to the GitHub Release `v1.0-doserad2026`; each bundle contains the
+Weight bundles are **available upon request** (contact kai.2.wang@cuanschutz.edu); each bundle contains the
 network weights, the matching deploy config, `beam_parameters.json`, and `DEPLOY_ENV.txt` (the
 exact environment variables baked into the scored container). Weights were extracted from the
-exact Docker images that produced the leaderboard entries (image IDs in the release notes).
+exact Docker images that produced the leaderboard entries (image IDs available with the bundles).
 
 | Task | Version | Model | gamma 1%/1mm | Runtime | Bundle |
 |---|---|---|---|---|---|

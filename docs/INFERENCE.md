@@ -8,7 +8,7 @@ compute their own pencil-beam prior on GPU.
 ## Quick start (per task)
 
 ```bash
-# 1) Download a bundle from the GitHub Release and unpack it into the container's weights dir
+# 1) Obtain a weight bundle (available upon request, see docs/MODEL_ZOO.md) and unpack it
 tar -xzf photonct_quality.tar.gz -C container/photon/weights/
 
 # 2) Apply the deployment environment of that version

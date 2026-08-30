@@ -5,8 +5,9 @@ photon/proton × CT/MRI.** Developed for the DoseRAD2026 Grand Challenge (all fo
 AMC_DoseCalc: Kai Wang (corresponding), Meixu Chen, Rui Yang — Department of Radiation Oncology,
 University of Colorado Anschutz Medical Campus.
 
-> Status: private until the challenge's public-release date. Weight bundles for every released
-> model are attached to the GitHub Release; see [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md).
+> Status: private until the challenge's public-release date.
+> **Model weights are available upon request**: contact Kai Wang (kai.2.wang@cuanschutz.edu).
+> See [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) for the released versions and their metrics.
 
 ## Method in one paragraph
 
