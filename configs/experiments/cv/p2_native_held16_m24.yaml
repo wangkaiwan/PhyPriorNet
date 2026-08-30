@@ -1,0 +1,16 @@
+# TEMP eval-only config: p2 (all75_p2_ftg) NATIVE-path (final_eval) on held16, using the m24 cache
+# so the GT + patients match the deploy-path baseline exactly. Isolates deploy channel-building vs
+# training-channel convention. Arch fields copied verbatim from all75_p2_ftg.yaml.
+exp_name: p2_native_held16_m24
+modality: ct
+in_ch: 6
+add_naive: true
+naive_skin_gate: true
+bottleneck: dilated
+base_ch: 48
+levels: 4
+dose_spacing_mm: 2.0
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+fold: 0
+run_root: /home/kaiwang/doserad2026_workdir/runs

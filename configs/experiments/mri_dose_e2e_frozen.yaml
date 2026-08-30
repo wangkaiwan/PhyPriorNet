@@ -1,0 +1,38 @@
+exp_name: mri_dose_e2e_frozen_ctrl
+# END-TO-END dose-aware MRI->sCT->dose. MRI -> v4 MONAI UNet -> sCT -> differentiable physics channels
+# (diff_channels: density/rdepth/fluence/naive, grad flows into the sCT) -> v13 DoseUNet3D -> dose.
+# Joint finetune (both nets warm-started); multi-task loss = dose weighted-L1 + lam_sct * sCT-anchor L1
+# (vs real CT) so the sCT becomes dose-aware without drifting off-anatomy.
+modality: mri
+in_ch: 6                 # dose net = v13 layout [density,rdepth,fluence,dist,source,naive]
+fold: 0
+bottleneck: dilated
+base_ch: 48
+levels: 4
+patch: 128
+k_cps: 2                 # control points per patient per step (amortise the full-volume synthesis)
+lam_sct: 0.0             # frozen synth: sCT anchor irrelevant
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 2.0e-5               # small joint finetune
+weight_decay: 1.0e-4
+max_steps: 30000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+val_cps: 32
+num_workers: 0          # custom in-process loader (full-volume synth; no DataLoader)
+wandb: true
+wandb_project: doserad2026
+synth_ckpt: /data/kwang/sct_paired_runs/v4/best.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/v13ft_photon_ct_dilated_hardregions/state.pt
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+root_dir: /data/kwang/DoseRad2026_raw/photon/training
+freeze_synth: true   # CONTROL: fix sCT at v4, only finetune dose net (isolates the dose-aware-synth gain)

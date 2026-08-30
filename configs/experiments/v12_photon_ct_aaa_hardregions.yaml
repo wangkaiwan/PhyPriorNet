@@ -1,0 +1,38 @@
+exp_name: v12_photon_ct_aaa_hardregions
+fold: 0
+modality: ct
+# v12: Tier-2 AAA prior (aaa_prior_dose, precomputed in aaa_cache_dir) as the 6th channel,
+# + v9 hard-region weighting. Tests whether a BETTER prior than naive lifts the DL FINAL.
+# CAVEAT: naive prior already washed out at plan level (v5≈v6); AAA only moderately matches
+# pyRadPlan (corr 0.89) but beats naive vs GT. Manage expectations — this is the test.
+in_ch: 6
+add_naive: false          # the 6th channel is the AAA prior, NOT naive
+aaa_cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_aaa
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 240000
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 200
+val_every: 10000
+val_crops: 240
+val_gamma_crops: 60
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

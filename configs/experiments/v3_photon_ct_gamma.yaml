@@ -1,0 +1,33 @@
+exp_name: v3_photon_ct_gamma
+fold: 0
+modality: ct
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 40000        # fine-tune (warm-started from v2), not from scratch
+lr: 1.0e-4              # lower LR for fine-tuning
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.3            # FIXED gamma_proxy (capped at 2.0 + denom floor) — the direct
+                       # 1%/1mm sharpness lever. Stable in CPU smoke (term bounded 0.4-0.7,
+                       # no collapse). Re-enabled here on top of the v2 amplitude baseline.
+gamma_warmup: 2000     # ramp gamma_w 0->0.3 over 2k steps (model already trained)
+dose_spacing_mm: 2.0
+ckpt_every: 200
+val_every: 2000
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+val_crops: 24          # crops for in-loop masked-MAE
+val_gamma_crops: 6     # crops for in-loop real gamma (slower)
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+# launch (after v2 finishes):
+#   CUDA_VISIBLE_DEVICES=1 conda run -n doserad python scripts/train.py \
+#     --config configs/experiments/v3_photon_ct_gamma.yaml \
+#     --init-from /home/kaiwang/doserad2026_workdir/runs/v2_photon_ct/state.pt \
+#     > logs/train_v3.log 2>&1 &

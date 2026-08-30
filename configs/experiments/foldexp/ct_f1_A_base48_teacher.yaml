@@ -1,0 +1,40 @@
+# FOLD EXPERIMENT (user 2026-08-21): "is a directly-trained small model better than a distilled one,
+# on our SMALL data?" — tested on a REAL held-out fold (photon-CT = real CT, no MR fantasy, so fold
+# held-out gamma is a VALID internal signal, unlike proton-MRI). fold_1 = 60 train / 15 held-out.
+# ALL 4 arms share this recipe (production skinentry_m24 cache, margin-24) + fold_1; only base_ch /
+# distill_w / init_student differ, all via scripts/distill_dose_photon.py.
+#
+# ARM A = base48, GT-only (distill_w 0). Serves TWO roles: (1) the base48 held-out reference (upper
+# bound), (2) the FOLD-CLEAN teacher for the KD arms B/D (the full-data 4018f597 saw the 15 held-out
+# → cannot be the teacher without leaking). Must train first; B/D depend on its state.pt.
+exp_name: foldexp_ct_f1_A_base48
+fold: 1
+modality: ct
+in_ch: 6
+base_ch: 48
+levels: 4
+bottleneck: dilated
+distill_w: 0.0            # GT-only, no teacher
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+max_steps: 120000
+lr: 2.0e-04
+weight_decay: 0.0001
+ckpt_every: 20000
+log_every: 200
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

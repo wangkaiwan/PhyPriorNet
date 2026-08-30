@@ -1,0 +1,53 @@
+# Add MRAUG (shift-robustness) on top of TODAY's photon-mm (m24L_p4_mmB_ft40k = the multimodal continued
+# finetune, held16 96.72, the best in-sample photon-MRI). User directive 2026-08-19: continue from TODAY's
+# NEW model (not the old Aug-1 m24S2ft_mraug) so we cleanly measure "how much does +mraug add". Recipe =
+# mraug coarse (coarse_ct_whole_soft_mraug, from clf_whole_mraug) + mr_aug + ct_mix 0.5 (multimodal) +
+# margin-24, full joint synth+dose, 40k. Serves BOTH photon-MRI (now shift-robust) and photon-CT (mmB dose net).
+exp_name: photonmm_mraug_ft40k
+modality: mri
+in_ch: 6
+synth_in_ch: 2
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft_mraug
+fold: all
+bottleneck: dilated
+base_ch: 48
+levels: 4
+patch: 128
+k_cps: 2
+lam_sct: 0.3
+sct_w_bone: 6.0
+sct_w_lung: 3.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 40000
+log_every: 100
+ckpt_every: 5000
+val_every: 5000
+val_cps: 32
+num_workers: 0
+wandb: true
+wandb_project: doserad2026
+synth_ckpt: /data/kwang/sct_refine_runs/refda_synth.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/m24_p2_ftg/state.pt
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+root_dir: /data/kwang/DoseRad2026_raw/photon/training
+naive_skin_gate: true
+init_from: /home/kaiwang/doserad2026_workdir/runs/m24L_p4_mmB_ft40k/best.pt
+ct_mix_cache: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+ct_mix_prob: 0.5
+ct_mix_batch: 1
+freeze_synth: false
+snap_every: 5000
+mr_aug:
+  bias: 0.5
+  gamma: [0.6, 1.7]
+  noise: 0.04

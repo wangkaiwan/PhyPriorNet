@@ -1,0 +1,35 @@
+# ARM C = base32, GT-only (distill_w 0), trained FROM SCRATCH. = the user's "方案 1 (start from scratch)".
+# The clean control that answers "does KD help or hurt at base32 on our small data?" vs ARM B (base32
+# gt+kd). If C >= B held-out, the user's overfitting-hypothesis holds. Independent of A (no teacher) —
+# can run in parallel with A on the other GPU.
+exp_name: foldexp_ct_f1_C_base32scratch
+fold: 1
+modality: ct
+in_ch: 6
+base_ch: 32
+levels: 4
+bottleneck: dilated
+distill_w: 0.0            # GT-only, no teacher (from scratch)
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+max_steps: 120000
+lr: 2.0e-04
+weight_decay: 0.0001
+ckpt_every: 20000
+log_every: 200
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

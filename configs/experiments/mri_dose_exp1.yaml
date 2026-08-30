@@ -1,0 +1,39 @@
+exp_name: mri_dose_exp1_mrionly
+# EXP1: MRI -> dose (no sCT). Channels [MRI, dist_to_cax, source_dist, open_mask], in_ch=4.
+# v13 PARITY: identical arch (dilated bottleneck), weighting, val metrics, wandb fields,
+# OneCycle schedule, resumable state.pt ckpt — the ONLY difference from v13 is the model INPUT.
+# Recipe: conservative-LR long run (user 2026-06-19): 120k steps, OneCycle peak lr 1e-4.
+mode: mri
+modality: mri
+in_ch: 4
+fold: 0
+bottleneck: dilated          # match v13 (ASPP long-range context)
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+# v11/v9 hard-region weighting (het/lung use GT-CT density from the dataset, training-only — no leakage):
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+lr: 1.0e-4                    # conservative-LR long run (v13 from-scratch used 3e-4)
+weight_decay: 1.0e-4
+max_steps: 120000
+log_every: 200
+ckpt_every: 5000             # resumable state.pt cadence (reboot-safe)
+val_every: 5000              # in-loop validation cadence
+val_crops: 240               # match v13
+val_gamma_crops: 0           # in-loop = masked-MAE only (gamma at final_eval), match v13
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

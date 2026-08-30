@@ -1,0 +1,50 @@
+# Proton-MRI E2E on the NATIVE 1x1x3 pipeline (user directive 2026-08-03).
+# synth <- whole-image-trained 1x1x3 refiner (ref_1x1x3_samefield_whole, converted to synth. prefix)
+# dose  <- proton-CT champion all75_r2_ft (held16 97.50) — NO init_from (would overwrite both).
+# native_synth: true -> load_vol reads MR/CT from PROTON_ROOT (native 1x1x3), grid becomes identity;
+#   synth runs natively (matches how ref_1x1x3 was trained). Joint finetune: dose gradient + L_sct + L_wepl
+#   all flow into the synth (freeze_synth: false) -> the 1x1x3 sCT becomes dose-aware & range-optimized.
+exp_name: e2e_1x1x3_whole_protonmri
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: all
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 40000
+log_every: 100
+ckpt_every: 10000
+val_every: 10000
+wandb: true
+wandb_project: doserad2026
+native_synth: true
+coarse_dir: /data/kwang/coarse_ct_1x1x3_samefield_whole_soft
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /data/kwang/sct_refine_runs/ref_1x1x3_samefield_whole2/synth_ckpt.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_r2_ft/state.pt
+freeze_synth: false
+density_direct: true
+skin_entry: true
+mr_aug:
+  bias: 0.5
+  gamma: [0.6, 1.7]
+  noise: 0.04
+vol_cache_n: 80   # 6x speedup (cache all 75 patients' CPU arrays); resume 30k->40k ~1.4h vs ~11h.

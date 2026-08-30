@@ -1,0 +1,40 @@
+exp_name: proton_mri_e2e_wepl_uncert
+# Task-4 dose-aware + WEPL-consistency loss (range-targeted). Same as proton_mri_e2e_wholesoft (83.0)
+# but adds L1(sCT-WEPL, realCT-WEPL) — directly supervises integrated along-beam density (proton range),
+# the diagnosed bottleneck (sCT cost -14 is range-driven). Isolates the WEPL-loss lever vs 83.0.
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: 0
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5                 # range-consistency loss weight (NEW)
+lr: 2.0e-5
+weight_decay: 1.0e-4
+max_steps: 15000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: true
+wandb_project: doserad2026
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/mri_dose_e2e_fuse_a14_wholesoft/best.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/proton_ct_prior_gpu_weplfix_ft/best.pt
+sct_w_bone: 2.0
+sct_w_lung: 0.3

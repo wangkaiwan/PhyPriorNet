@@ -1,0 +1,21 @@
+exp_name: v2_photon_ct
+fold: 0
+modality: ct
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 120000      # ~7.5 epochs (v1 plateaued at 40k / 2.5 epochs)
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0           # gamma_proxy disabled (collapsed v1; needs numeric fix first)
+dose_spacing_mm: 2.0
+ckpt_every: 200
+val_every: 2000
+base_ch: 48            # up from 32 (~16M params, ~DeepDose capacity) to lift the MAE plateau
+levels: 4
+num_workers: 4
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

@@ -1,0 +1,51 @@
+# Proton-MRI dose-aware E2E finetune — ALL-FIELD sCT variant (user idea 2026-08-19/20).
+# CLEAN test of "all-field vs same-field sCT" for proton-MRI: identical to the DEPLOYED all75_r3ft_mraug
+# lineage in EVERY way (lr, steps, mr_aug, losses) EXCEPT two changes that together = "all-field":
+#   1) coarse_dir  -> coarse_ct_whole_soft_allfield  (coarse from all-field clf_whole over all 357)
+#   2) init_from   -> allfield_protonmri_e2e.pt       (synth = ref_allfield_wt2, dose = deployed r3ft_mraug)
+# freeze_synth:false -> synth (all-field) + dose adapt JOINTLY to the all-field coarse = dose-aware, NO
+# confound (unlike the non-dose-aware probe container). Baseline to beat: deployed 79.08 (leaderboard) /
+# held16 in-sample. Held-out folds are the real judge (in-sample proton-MRI is fantasy).
+exp_name: all75_r3ft_allfield_protonmri
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: all
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 20000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: true
+wandb_project: doserad2026
+coarse_dir: /data/kwang/doserad_cache_hdd/coarse_ct_whole_soft_allfield
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_p3_photonmri/state.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_r2_ft/state.pt
+init_from: /home/kaiwang/doserad2026_workdir/runs/allfield_protonmri_e2e.pt
+freeze_synth: false
+density_direct: true
+skin_entry: true
+mr_aug:
+  bias: 0.5
+  gamma: [0.6, 1.7]
+  noise: 0.04

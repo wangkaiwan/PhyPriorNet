@@ -1,0 +1,39 @@
+exp_name: v11_photon_ct_noprior_hardregions
+fold: 0
+modality: ct
+# HYPOTHESIS: v5 (no prior) >= v6 (naive prior) at plan-level, and v9's lung/interface
+# loss weighting is the proven lever (+4.4 over v6). Combine: CLEAN no-prior base + v9
+# weighting. Differs from v9 ONLY in the prior (in_ch 5 vs 6, no naive channel).
+in_ch: 5
+add_naive: false
+augment: false
+# v9 hard-region loss weighting (clinically-highest-error regions; see dose-hard-regions):
+grad_w: 3.0            # penumbra (dose-gradient / field edges)
+het_w: 4.0             # bone/soft-tissue/lung/air INTERFACES (density-gradient)
+lung_w: 2.0            # LUNG + very-low-density (density in [lung_lo, lung_hi])
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+# NEW PROTOCOL (2026-06-13, user): 2x steps + 10x val crops + validate every 10k.
+max_steps: 240000
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 5000       # save every 5k (was 200) — less disk I/O
+log_every: 200         # console + wandb cadence (decoupled from ckpt)
+val_every: 10000
+val_crops: 240         # 10x (smoother best-ckpt selection; fixes PITFALLS 12b noisy 24-crop)
+val_gamma_crops: 0     # in-loop gamma OFF (MAE-only val); full gamma at final_eval
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

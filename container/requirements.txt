@@ -1,0 +1,7 @@
+# Container-only deps. torch ships with the base image (pytorch/pytorch:2.12.0-cuda13.0);
+# versions pinned to the validated `doserad` env. The old requirements-lock.txt is a host
+# pip-freeze with local-path entries (-e /home/..., file:///home/conda/...) — unusable in-image.
+numpy==2.4.6
+SimpleITK==2.5.5
+pydantic==2.13.4      # doserad.beam.photon_config (PhotonPlan) — on the photon import path only
+PyYAML==6.0.3         # the two MRI apps read their model config from YAML

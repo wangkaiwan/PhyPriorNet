@@ -1,0 +1,25 @@
+exp_name: v1_photon_ct
+fold: 0
+modality: ct
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 40000
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0            # DISABLED: gamma_proxy collapsed 40k run to all-zero (local
+                       # denom -> 0 in low-gradient high-dose plateaus -> gamma ~1e3,
+                       # dominates L1 ~1e4x, destabilizes under fp16/OneCycleLR over a
+                       # long run). Re-enable only after the term is numerically fixed
+                       # (floor denom / cap gamma / normalize) and tested at scale.
+dose_spacing_mm: 2.0   # photon dose grid spacing (mm), for the gamma DTA term
+ckpt_every: 200
+val_every: 2000
+base_ch: 32
+levels: 4
+num_workers: 4         # local CPU has 4 cores
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

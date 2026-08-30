@@ -1,0 +1,8 @@
+# Extra deps for the two MRI containers only. The sCT synth branch of E2E
+# (scripts/train_dose_e2e.py) is a monai UNet, so monai must be importable; the photon/proton CT
+# images stay free of it. monai-core needs only torch + numpy, both already in the base image.
+monai==1.5.2
+# load_classifier pulls scripts/train_sct_classifier -> train_sct_paired, whose module-level
+# imports include matplotlib; scipy is used by monai.transforms and by that module's helpers.
+matplotlib==3.11.0
+scipy==1.17.1

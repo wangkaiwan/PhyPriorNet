@@ -1,0 +1,43 @@
+# 3mm photon-CT stage 2: finetune, EXACT copy of m24_p2_ftg (the deployed model's finetune stage:
+# 40k steps, lr 3e-5, init_from p1) with only cache/exp_name/init_from/dose_spacing changed.
+exp_name: sp3_p2_ftg
+fold: all
+modality: ct
+in_ch: 6
+add_naive: true
+bottleneck: dilated
+base_ch: 48
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch:
+- 128
+- 128
+- 128
+batch_size: 2
+fg_prob: 0.7
+max_steps: 40000
+lr: 3.0e-05
+weight_decay: 0.0001
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 3.0
+ckpt_every: 5000
+log_every: 200
+val_every: 5000
+val_crops: 240
+val_gamma_crops: 0
+levels: 4
+num_workers: 8
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_3mm_m16
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+init_from: /home/kaiwang/doserad2026_workdir/runs/sp3_p1_photonct/state.pt
+naive_skin_gate: true
+snap_every: 5000

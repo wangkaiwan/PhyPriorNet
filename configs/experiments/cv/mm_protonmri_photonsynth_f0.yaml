@@ -1,0 +1,48 @@
+# Proton-MRI MULTI-MODAL (leg B): same as the fine-tune (freeze photon scheme2-p4 synth, density_direct
+# false, train dose on fold-0's 59 with wepl range loss) BUT interleave real-CT proton beamlet batches
+# (ct_mix) so the dose net is robust to BOTH the MRI-sCT density and real-CT density. Hypothesis (user):
+# prior proton multi-modal looked bad because the OLD sCT was poor; with the good scheme2-p4 sCT it may
+# now help. Eval on fold-0's 16 vs the 93.2 zero-training swap and vs the pure fine-tune (leg A).
+exp_name: mm_protonmri_photonsynth_f0
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: 0
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 20000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: false
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd_local
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/m24S2_p4_mmB/state.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_extracted/protonmri_f0_dose.pt
+freeze_synth: true
+density_direct: false
+skin_entry: true
+# --- multi-modal: interleave real-CT proton beamlets (dose-net only) ---
+ct_mix_cache: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd_local
+ct_mix_prior_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_prior_skinentry_ssd
+ct_mix_wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+ct_mix_prob: 0.5
+ct_mix_batch: 1

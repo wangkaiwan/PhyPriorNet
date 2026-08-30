@@ -1,0 +1,36 @@
+exp_name: proton_mri_e2e_wholesoft
+# Task-4 (Proton-MRI) dose-aware joint training. synth(2mm wholesoft) + UNMASKED proton champion engine,
+# jointly finetuned; proton dose loss back-props through differentiable WEPL+PB into the synth.
+# Resolution: synth at 2mm -> differentiable grid_sample -> native 1x1x3mm proton physics.
+modality: proton
+in_ch: 5                 # proton with-prior: [density, WEPL, pb_prior, lateral, energy]
+synth_in_ch: 2          # [MR, wholesoft coarse] (2mm)
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: 0
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+lr: 2.0e-5              # conservative finetune (warm-started both nets)
+weight_decay: 1.0e-4
+max_steps: 30000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: true
+wandb_project: doserad2026
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/mri_dose_e2e_fuse_a14_wholesoft/best.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/proton_ct_prior_gpu_weplfix_ft/best.pt

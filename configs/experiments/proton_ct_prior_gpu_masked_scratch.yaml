@@ -1,0 +1,40 @@
+exp_name: proton_ct_prior_gpu_masked_scratch
+# Proton-CT (Task3) WITH-PRIOR, FROM SCRATCH, masked prior. User 2026-06-27: retrain from scratch
+# (NOT finetune) on the body-mask prior — GPU-PB Hong PB dose with external air (density<0.1, outside
+# binary_fill_holes body mask) zeroed; internal cavities kept. WEPL channel = WEPL-fix (corrected
+# ray-march). Same from-scratch recipe as proton_ct_prior (lr 1e-4, 120k, in_ch=5), NO init_from.
+# Rationale: maskair as a finetune of the unmasked champion gave 96.7 (−0.3) — warm-start fought the
+# learned distribution. From scratch lets the net learn directly on the masked prior; also the clean
+# basis carried into Task 4 (MRI-proton) per user. Champion to beat = GPU-PB ft + WEPL-fix (97.0).
+# Channel stack: [density, corrected-WEPL, pb_prior(GPU, masked), lateral_dist, energy].
+modality: proton
+in_ch: 5
+fold: 0
+bottleneck: dilated
+patch: [32, 128, 128]
+batch_size: 4
+fg_prob: 0.7
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 1.0e-4
+weight_decay: 1.0e-4
+max_steps: 120000
+log_every: 200
+ckpt_every: 5000
+val_every: 5000
+val_crops: 240
+base_ch: 48
+levels: 4
+num_workers: 8
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+prior_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_prior_gpu_masked
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

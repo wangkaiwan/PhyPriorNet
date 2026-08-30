@@ -1,0 +1,37 @@
+# base40 distilled photon-CT student from the DEPLOYED champion 4018f597 (docker_extracted/photon_ct_docker.pt,
+# held16 98.78 — the PROVEN best CT teacher, beats today's photon-mm 98.61 and m24L 98.58). base40 is the
+# runtime lever for photon-CT (4th, runtime-bound at 80s): bigger than the base32 student (which lost −1.69
+# gamma held-out) → less gamma loss, still ~1.7x faster net. STAGED, NOT launched — pending user go (they
+# wanted to check photonmm+mraug's CT sub-net first, but 4018f597 is very likely the best teacher).
+exp_name: distill_photonct_b40_from4018
+fold: all
+modality: ct
+in_ch: 6
+base_ch: 40
+levels: 4
+bottleneck: dilated
+teacher_ckpt: /home/kaiwang/doserad2026_workdir/runs/docker_extracted/photon_ct_docker.pt
+distill_w: 0.5
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+max_steps: 200000
+lr: 2.0e-04
+weight_decay: 0.0001
+ckpt_every: 10000
+log_every: 200
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

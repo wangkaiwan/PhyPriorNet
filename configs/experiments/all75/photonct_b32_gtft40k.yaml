@@ -1,0 +1,50 @@
+# Pure GT-supervised continuation of the distilled base32 photon student.
+# Question under test (2026-08-19): does removing the KD term and training the
+# distilled student directly on Photon-CT GT make it better or worse?
+# Single-variable design: identical to distill_photonct_b32_all75_ft.yaml except
+# distill_w=0 (teacher skipped) and init_student = ft snap_40000 EMA (the best of
+# the ft snapshots: mean plan-g1 0.9689 vs 0.9680@20k / 0.9687@60k, 16-pt training-set eval).
+exp_name: photonct_b32_gtft40k
+fold: all
+modality: ct
+
+# STUDENT architecture (identical to distilled base32)
+in_ch: 6
+base_ch: 32
+levels: 4
+bottleneck: dilated
+
+# pure GT supervision: no teacher
+distill_w: 0.0
+teacher_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_extracted/p4_dosenet.pt  # unused at distill_w=0
+init_student: /home/kaiwang/doserad2026_workdir/runs/distill_photonct_b32_all75_ft/snap_40000.pt
+
+# data / channels (identical to teacher recipe)
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+
+# loss weights (identical to ftg_skinentry_photonct_f0)
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+
+# schedule — identical LR to the ft continuation so the ONLY variable is the KD term
+max_steps: 40000
+lr: 1.0e-05
+weight_decay: 0.0001
+ckpt_every: 10000
+log_every: 200
+
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24  # ssd cache was cleaned up; m24 is the later project-standard photon cache (NOTE: crop-margin differs from the ft run's ssd cache - documented confound)
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

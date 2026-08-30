@@ -1,0 +1,39 @@
+exp_name: v13_photon_ct_dilated_hardregions
+fold: 0
+modality: ct
+# v13 ENHANCED ARCH (2026-06-15): naive prior + FULL v9 weighting (3/4/2) + DILATED-context bottleneck
+# (long-range RF). From-scratch 120k. PAIR with v13np (same dilated arch, NO prior) → clean prior A/B
+# WITHIN the v13 architecture at 120k. Also vs v9-last (naive+wt+plain 120k = 94.87) → dilated effect.
+# Benchmark: dilated +0.3ms fwd (≤1s safe).
+in_ch: 6
+add_naive: true
+bottleneck: dilated        # <-- the only change vs v9abl_full
+base_ch: 48
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 120000          # full from-scratch run (paired with v13np at the same 120k)
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 5000
+log_every: 200
+val_every: 10000
+val_crops: 240
+val_gamma_crops: 0
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

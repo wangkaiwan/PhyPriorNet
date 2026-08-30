@@ -1,0 +1,40 @@
+# Engine-v2 next iteration: b32 proton student ON THE V3 PHYSICS (fold-experiment verdict: base32 is
+# ~lossless for proton, D-recipe distill best). Teacher = all75_r2_ft_v3physics (the engine net).
+# Trainer = train_dose_proton.py with the opt-in KD added 2026-08-21. Full data, v3 wepl/prior caches.
+# Goal: engine forward 11s -> ~5-6s => ~8s/plan local, T4 ~30s.
+exp_name: distill_protonct_b32_v3
+modality: proton
+in_ch: 5
+fold: all
+bottleneck: dilated
+patch: [32, 128, 128]
+batch_size: 4
+fg_prob: 0.7
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 3.0e-04
+weight_decay: 1.0e-04
+max_steps: 120000
+log_every: 200
+ckpt_every: 5000
+val_every: 10000
+val_crops: 240
+base_ch: 32
+levels: 4
+num_workers: 8
+distill_w: 0.5
+teacher_base: 48
+teacher_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_r2_ft_v3physics/best.pt
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+prior_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_prior_v3
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_v3
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+snap_every: 5000

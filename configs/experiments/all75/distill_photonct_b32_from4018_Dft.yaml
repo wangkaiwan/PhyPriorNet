@@ -1,0 +1,36 @@
+# D-recipe GT-finetune of b32_from4018 (user queued 2026-08-26): the foldexp-D recipe (distill-init +
+# GT-only ft) applied to the full-data student — squeeze quality at the same speed. Pure GT (distill_w 0),
+# m24 cache (the student's own training cache), 40k @ 5e-5 (foldexp-D hypers). Gate: official-harness
+# gamma at the chosen margin must beat plain from4018 by >= +0.2 to ship.
+exp_name: distill_photonct_b32_from4018_Dft
+fold: all
+modality: ct
+in_ch: 6
+base_ch: 32
+levels: 4
+bottleneck: dilated
+distill_w: 0.0
+init_student: /home/kaiwang/doserad2026_workdir/runs/distill_photonct_b32_from4018/state.pt
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+max_steps: 40000
+lr: 5.0e-05
+weight_decay: 0.0001
+ckpt_every: 5000
+log_every: 200
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

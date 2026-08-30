@@ -1,0 +1,38 @@
+# m12-margin finetune of b32_from4018 (probe #2 candidate, user 2026-08-26 "不试白不试" ladder):
+# fix the train(m24)/infer(m12) margin mismatch by finetuning ON the m12 cache — mirrors the proven
+# ftm16_from_best recipe that produced the board-best m16 entry. init_student = b32_from4018 (full-data,
+# teacher 4018f597, 200k). 40k @ lr 1e-5 (same as distill_photonct_b32_all75_ft precedent). Full data.
+# GATE: internal official-harness gamma must improve >= +0.3 over b32_from4018@m12 (96.56) to ship.
+exp_name: distill_photonct_b32_from4018_ftm12
+fold: all
+modality: ct
+in_ch: 6
+base_ch: 32
+levels: 4
+bottleneck: dilated
+teacher_ckpt: /home/kaiwang/doserad2026_workdir/runs/docker_extracted/photon_ct_docker.pt
+init_student: /home/kaiwang/doserad2026_workdir/runs/distill_photonct_b32_from4018/state.pt
+distill_w: 0.5
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+max_steps: 40000
+lr: 1.0e-05
+weight_decay: 0.0001
+ckpt_every: 5000
+log_every: 200
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m12
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+wandb: true
+wandb_project: doserad2026

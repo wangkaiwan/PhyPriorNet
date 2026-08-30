@@ -1,0 +1,38 @@
+exp_name: v9ft_photon_ct_hardregions
+fold: 0
+modality: ct
+# v9 FINE-TUNE (replaces the old "v9long @240k" idea, user 2026-06-13): warm-start from
+# v9's LAST ckpt (EMA weights), small LR, fewer steps — refine the current best rather than
+# retrain from scratch. Same prior + weighting as v9 (in_ch=6 naive + lung/interface loss).
+init_from: /home/kaiwang/doserad2026_workdir/runs/v9_photon_ct_hardregions/state.pt
+in_ch: 6
+add_naive: true
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 60000           # short continuation (not 240k)
+lr: 5.0e-5                 # small peak LR for gentle fine-tune of a converged model (v9 trained at 3e-4)
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 5000          # save every 5k (was 200) — less disk I/O
+log_every: 200            # console + wandb still every 200 (decoupled from ckpt)
+val_every: 5000
+val_crops: 240
+val_gamma_crops: 0     # in-loop gamma OFF (MAE-only val); full gamma at final_eval
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

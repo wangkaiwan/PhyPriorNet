@@ -1,25 +1,77 @@
 # PhyPriorNet
 
-A unified differentiable physics-prior residual 3D U-Net for beam-level dose prediction across
-photon/proton x CT/MRI. Developed for the DoseRAD2026 Grand Challenge (all four tasks) by
-AMC_DoseCalc (Kai Wang, Meixu Chen, Rui Yang — University of Colorado Anschutz Medical Campus).
+**A unified differentiable physics-prior residual 3D U-Net for beam-level dose prediction across
+photon/proton × CT/MRI.** Developed for the DoseRAD2026 Grand Challenge (all four tasks) by
+AMC_DoseCalc: Kai Wang (corresponding), Meixu Chen, Rui Yang — Department of Radiation Oncology,
+University of Colorado Anschutz Medical Campus.
 
-**Status: code release in preparation** (full implementation, differentiable physics operators,
-GPU pencil-beam prior, deployment containers, and final weights will be added before 2026-10-01
-per the challenge open-source requirement).
+> Status: private until the challenge's public-release date. Weight bundles for every released
+> model are attached to the GitHub Release; see [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md).
 
-## Reports
+## Method in one paragraph
 
-Per-task LNCS method reports (final-submission versions) are in [`reports/`](reports/):
+For each beam element (photon MLC control point or proton beamlet), an analytical,
+**differentiable** physics operator turns a density image and the beam descriptor into
+dose-shaped input channels — radiological depth and MLC-projected fluence for photons;
+skin-entry WEPL and a self-contained GPU Hong pencil-beam prior (~95% of the dose) for protons.
+A compact 3D U-Net (DoseUNet3D: ASPP bottleneck, Softplus head, FiLM modality conditioning)
+learns only the **residual to Monte Carlo**. On CT the density comes from the HU calibration; on
+MRI a classifier→refiner synthesizer produces it and is trained **jointly through the physics**
+with the dose loss, so the synthetic CT is optimized for dose, not image fidelity (and we show
+image fidelity does not predict dose accuracy). Deployment adds knowledge-distilled students,
+a batched proton engine (per-beam orthographic BEV cumulative-sum WEPL, 388× on the WEPL stage),
+and streaming writers — every speed lever gated to lose no accuracy.
 
-| Task | Report |
-|---|---|
-| Photon-CT | `reports/paper_LNCS_photonct_v1.pdf` |
-| Photon-MRI | `reports/paper_LNCS_photonmri_v1.pdf` |
-| Proton-CT | `reports/paper_LNCS_protonct_v1.pdf` |
-| Proton-MRI | `reports/paper_LNCS_protonmri_v1.pdf` |
+## Repository layout
 
-Method in one line: per beam element (photon MLC control point / proton beamlet), analytical
-differentiable physics channels (radiological depth / WEPL / GPU Hong pencil-beam prior) feed a
-residual 3D U-Net that corrects the prior toward Monte Carlo; on MRI a classifier-refiner
-synthesizer is trained jointly through the physics, making the synthetic CT dose-aware.
+```
+doserad/     core package: differentiable physics operators, DoseUNet3D, data pipeline
+accel/       deployment acceleration: batched proton engine v2, GPU channel builders
+container/   the four Grand-Challenge invoke containers (photon/proton × CT/MRI)
+scripts/     training, cache precompute, evaluation (official-metric harness)
+configs/     every experiment's YAML (the released models' configs included)
+reports/     the four per-task LNCS method reports (PDF + source)
+docs/        MODEL_ZOO.md · TRAINING.md · INFERENCE.md
+```
+
+## Reproducing our results
+
+1. **Inference with released weights**: [docs/INFERENCE.md](docs/INFERENCE.md) — download a
+   bundle, build the container, run on the Grand-Challenge job layout. Bundles were extracted
+   from the exact Docker images that produced our leaderboard entries.
+2. **Training from scratch**: [docs/TRAINING.md](docs/TRAINING.md) — per-task recipes
+   (cache precompute → base training → finetunes → distillation), with the pitfalls we hit
+   documented inline.
+3. **Which model to use**: [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) — per task, the
+   highest-quality version and the fastest quality-gated version, with hidden-test metrics.
+
+## Results (DoseRAD2026 preliminary hidden test set)
+
+| Task | γ 1%/1mm (quality / fast) | Runtime (quality / fast) |
+|---|---|---|
+| Photon-CT | 95.51 / 93.87 | 103.6 s / 45.4 s |
+| Photon-MRI | 84.11 / 82.90 | 94.8 s / 57.4 s |
+| Proton-CT | 95.60 / 95.31 | 191.7 s / 101.1 s |
+| Proton-MRI | 79.34 / 79.08 | 188.8 s / 110 s |
+
+Internal 5-fold cross-validation on the 75 public patients: 93.4 / 91.1 / 96.7 / 87.4
+(photon-CT / photon-MRI / proton-CT / proton-MRI); details, ablations, and the mechanistic
+analyses (real-CT ceiling, range-error decomposition, fidelity non-predictiveness) are in the
+per-task reports under `reports/`.
+
+## Citation
+
+Until a preprint is up, please cite the challenge reports:
+
+```
+Wang K, Chen M, Yang R. A Unified Differentiable Physics-Prior Residual 3D U-Net for Beam-Level
+Dose Prediction across Photon and Proton Radiotherapy on CT and MRI. DoseRAD2026 Grand Challenge
+method reports, 2026. https://github.com/wangkaiwan/PhyPriorNet
+```
+
+## Acknowledgments
+
+Built on the DoseRAD2026 Grand Challenge dataset (SynthRAD2025 cohort); ground-truth dose by
+Geant4 Monte Carlo; treatment plans generated with matRad. Large-language-model assistance
+(Claude, Anthropic) was used for drafting documentation and report text; all methods,
+experiments, analyses and conclusions are the authors' own.

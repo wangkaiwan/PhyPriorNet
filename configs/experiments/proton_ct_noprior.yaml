@@ -1,0 +1,34 @@
+exp_name: proton_ct_noprior
+# Proton-CT (Task3) NO-PRIOR arm. Channels [density, WEPL, lateral_dist, energy], in_ch=4.
+# v13-style recipe (dilated bottleneck + hard-region weighting + conservative-LR long run).
+# Pairs with proton_ct_prior (in_ch=5, +pyRadPlan PB prior) for the prior A/B.
+modality: proton
+in_ch: 4
+fold: 0
+bottleneck: dilated
+patch: [32, 128, 128]
+batch_size: 4
+fg_prob: 0.7
+# hard-region weighting (density from GT-CT, ch0; proton dose is range/density-sensitive):
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 1.0e-4
+weight_decay: 1.0e-4
+max_steps: 120000
+log_every: 200
+ckpt_every: 5000
+val_every: 5000
+val_crops: 240
+base_ch: 48
+levels: 4
+num_workers: 8
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

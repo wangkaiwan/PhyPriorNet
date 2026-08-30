@@ -1,0 +1,38 @@
+exp_name: v11ft_photon_ct_noprior_hardregions
+fold: 0
+modality: ct
+# v11 FINETUNE (user 2026-06-13): warm-start from v11's 70k ckpt (no-prior + v9 weighting),
+# small lr like v9ft, train 120k more. NOTE: v11@70k was NOT fully converged — 5e-5 is gentle,
+# may learn slowly; chosen for methodology consistency with v9ft (user's call).
+init_from: /home/kaiwang/doserad2026_workdir/runs/v11_photon_ct_noprior_hardregions/state.pt
+in_ch: 5
+add_naive: false
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 120000
+lr: 5.0e-5
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 5000
+log_every: 200
+val_every: 5000
+val_crops: 240
+val_gamma_crops: 0     # MAE-only val; best ckpt by lowest val MAE; full gamma at final_eval
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs

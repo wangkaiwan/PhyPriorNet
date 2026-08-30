@@ -1,0 +1,48 @@
+# MRI LADDER C (proton-MRI shot #2): joint E2E finetune at the ENGINE-V2 physics + mraug domain.
+# init_from = mri_v3dose_e2e.pt (the board-tested v2c stitch: mraug synth + v3physics dose). Recipe
+# mirrors all75_r3ft_mraug (the 8/1 board lineage: mraug coarse + mr_aug) with wepl_dir -> v3 so the
+# dose slot trains on the ch1 convention the engine serves. Goal: recover board −0.24γ + IDD regression
+# while keeping the 110s runtime; target board γ ~79.6-80.5.
+exp_name: mri_ladderC_v3joint
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: all
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 20000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: true
+wandb_project: doserad2026
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft_mraug
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_v3
+splits: /home/kaiwang/doserad2026_workdir/splits_all75.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_p3_photonmri/state.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_r2_ft_v3physics/best.pt
+init_from: /home/kaiwang/doserad2026_workdir/runs/mri_v3dose_e2e.pt
+freeze_synth: false
+density_direct: true
+skin_entry: true
+mr_aug:
+  bias: 0.5
+  gamma: [0.6, 1.7]
+  noise: 0.04

@@ -1,0 +1,40 @@
+exp_name: mri_dose_e2e_fuse_a14_wstslung
+# FUSION of #9/#10 (jointly-TRAINED dose net) x #14 (classify-then-regress refiner synth).
+# synth = [MR, coarse CT] (warm-start from refiner-da); dose net = v13 warm-start but UNFROZEN
+# (joint training, like A/B). Fuse-a14 = 6ch dose net (A-style); fuse-b14 = 8ch (+MRI+sCT, B-style).
+modality: mri
+in_ch: 6
+synth_in_ch: 2
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_wstslung
+fold: 0
+bottleneck: dilated
+base_ch: 48
+levels: 4
+patch: 128
+k_cps: 2
+lam_sct: 0.3
+sct_w_bone: 6.0
+sct_w_lung: 3.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+hi_frac: 0.1
+hi_w: 10.0
+lr: 2.0e-5
+weight_decay: 1.0e-4
+max_steps: 20000
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+val_cps: 32
+num_workers: 0
+wandb: true
+wandb_project: doserad2026
+synth_ckpt: /data/kwang/sct_refine_runs/refda_synth.pt
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/v13ft_photon_ct_dilated_hardregions/state.pt
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+root_dir: /data/kwang/DoseRad2026_raw/photon/training

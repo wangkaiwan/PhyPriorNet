@@ -1,0 +1,41 @@
+# Fine-tune the proton dose engine on the PHOTON scheme2-p4 sCT density (the +9γ synth-swap).
+# Freeze the (HU-space) photon synth, density_direct=false (hu_to_density), train ONLY the dose net on
+# fold-0's 59 so the engine adapts to the new density distribution; eval on fold-0's 16 vs the 93.2
+# zero-training swap. Base = all75_r3_protonmri.yaml (keeps wepl_w range-consistency loss).
+exp_name: ft_protonmri_photonsynth_f0
+modality: proton
+in_ch: 5
+synth_in_ch: 2
+base_ch: 48
+levels: 4
+bottleneck: dilated
+fold: 0
+patch: [32, 128, 128]
+k_cps: 2
+fg_prob: 0.7
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+lam_sct: 0.5
+wepl_w: 0.5                 # range-consistency L1(sCT-WEPL, realCT-WEPL) — proton-specific
+lr: 2.0e-05
+weight_decay: 0.0001
+max_steps: 20000           # fine-tune (not full 80k); dose only
+log_every: 100
+ckpt_every: 2500
+val_every: 2500
+wandb: false
+coarse_dir: /data/kwang/doserad_cache_archive/coarse_ct_whole_soft
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_ssd_local   # SSD copy (fast)
+wepl_dir: /home/kaiwang/doserad2026_workdir/cache/crops/proton_weplfix_ssd
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
+synth_ckpt: /home/kaiwang/doserad2026_workdir/runs/m24S2_p4_mmB/state.pt      # photon synth (HU-space)
+dose_ckpt: /home/kaiwang/doserad2026_workdir/runs/all75_extracted/protonmri_f0_dose.pt  # proton dose (bare)
+freeze_synth: true         # freeze photon synth; adapt ONLY the dose net to the new density
+density_direct: false      # photon synth outputs HU-space sct01 -> hu_to_density
+skin_entry: true

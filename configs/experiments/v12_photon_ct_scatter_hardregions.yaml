@@ -1,0 +1,39 @@
+exp_name: v12_photon_ct_scatter_hardregions
+fold: 0
+modality: ct
+# v12 (SWAPPED 2026-06-13): the BEST prior (v10's density-scaled scatter, Tier-1.5 —
+# standalone thorax 49.5% vs naive/AAA ~24%) + v9 hard-region loss weighting. Combines
+# the two levers PROVEN to help. Clean ablation vs v11 (no prior + weighting) and v9-long
+# (naive prior + weighting): all three share the weighting, differ only in the prior.
+in_ch: 6
+add_naive: true
+naive_scatter: true       # density-scaled lateral-scatter prior (the strong Tier-1.5 one)
+augment: false
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+patch: [128, 128, 128]
+batch_size: 2
+fg_prob: 0.7
+max_steps: 240000
+lr: 3.0e-4
+weight_decay: 1.0e-4
+hi_frac: 0.1
+hi_w: 10.0
+gamma_w: 0.0
+dose_spacing_mm: 2.0
+ckpt_every: 5000       # save every 5k (was 200) — less disk I/O
+log_every: 200         # console + wandb cadence (decoupled from ckpt)
+val_every: 10000
+val_crops: 240
+val_gamma_crops: 0     # in-loop gamma OFF (MAE-only val); full gamma at final_eval
+base_ch: 48
+levels: 4
+num_workers: 4
+wandb: true
+wandb_project: doserad2026
+cache_dir: /home/kaiwang/doserad2026_workdir/cache/crops/photon
+splits: /home/kaiwang/doserad2026_workdir/splits_final.json
+run_root: /home/kaiwang/doserad2026_workdir/runs
