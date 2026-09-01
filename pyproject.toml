@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phypriornet"
+version = "1.0.0"
+description = "Differentiable physics-prior residual 3D U-Net for beam-level dose prediction (DoseRAD2026)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0-or-later"}
+authors = [{name = "Kai Wang", email = "kai.2.wang@cuanschutz.edu"},
+           {name = "Meixu Chen"}, {name = "Rui Yang"}]
+dependencies = [
+    "torch>=2.1",
+    "numpy>=1.24",
+    "SimpleITK>=2.3",
+    "PyYAML>=6.0",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+eval = ["pymedphys>=0.39"]      # gamma analysis, used by scripts/eval_official_held16.py
+logging = ["wandb>=0.16"]       # optional training logger
+
+[project.urls]
+Repository = "https://github.com/wangkaiwan/PhyPriorNet"
+Challenge = "https://doserad2026.grand-challenge.org"
+
+[tool.setuptools]
+packages = ["doserad"]

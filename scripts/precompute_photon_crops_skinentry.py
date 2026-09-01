@@ -4,6 +4,9 @@ Identical to precompute_photon_crops.py except photon_channels_skinentry.
 DOSERAD_SHARD=k/N for CPU/GPU-parallel sharding; DOSERAD_FORCE=1 to overwrite."""
 from __future__ import annotations
 
+import sys as _sys, pathlib as _pathlib
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[1]))
+
 import os, sys
 from pathlib import Path
 import numpy as np

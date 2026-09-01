@@ -94,4 +94,16 @@ python scripts/train.py --config configs/released/all75_p2_ftg.yaml
 python scripts/eval_official_held16.py photon_ct             # official-metric check
 ```
 
-Each script prints its own arguments with `--help`; the headers document the expected inputs.
+Most scripts take arguments (`--help` lists them); a few cache builders are driven purely by the
+`DATA_ROOT` / `WORKDIR` environment variables and take none. Every script's module docstring
+documents its inputs and outputs; read the header before running a multi-hour cache build.
+
+## Training on your own data
+
+The pipeline is not tied to the challenge cohort. The organizers publish the Geant4 simulation
+code used to produce the ground truth (https://github.com/DoseRAD2026/geant4-dose-sim), so you
+can generate beam-level Monte-Carlo dose for your own patients and beam model, lay it out in the
+same directory structure (`<DATA_ROOT>/{photon,proton}/training/<pid>/{image/,dose/,<pid>.json}`
+plus `beam_parameters.json`), and run the same recipes. For a local linac or proton machine you
+will also want to re-fit the analytical prior to your commissioning data; the physics operators
+in `doserad/physics/` are where the machine model enters.

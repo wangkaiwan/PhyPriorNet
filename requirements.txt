@@ -1,0 +1,10 @@
+# Core runtime (install PyTorch first, matched to your CUDA: https://pytorch.org/get-started/locally/)
+torch>=2.1
+numpy>=1.24
+SimpleITK>=2.3
+PyYAML>=6.0
+scipy>=1.10
+# Evaluation (gamma analysis)
+pymedphys>=0.39
+# Optional training logger
+wandb>=0.16

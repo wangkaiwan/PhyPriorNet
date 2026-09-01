@@ -19,6 +19,13 @@ University of Colorado Anschutz Medical Campus.
 | Dataset download (Zenodo, 864 GB; HuggingFace mirror linked there) | https://doi.org/10.5281/zenodo.19347848 |
 | Dataset paper | https://doi.org/10.48550/arXiv.2604.12778 |
 | Underlying CT-MR cohort (SynthRAD2025) | https://doi.org/10.1002/mp.17981 |
+| Ground-truth Monte-Carlo simulation code (Geant4) | https://github.com/DoseRAD2026/geant4-dose-sim |
+
+Beyond the released data, the organizers' Geant4 simulation code (linked above) lets you
+generate beam-level Monte-Carlo dose on **your own** CT/MR cohort and beam model; our pipeline
+consumes exactly that layout, so it can be retrained on institutional data without modification
+(this is also how one would tailor the analytical prior to a local machine, see the reports'
+future-work sections).
 
 The public training set used here is 75 patients (39 thorax, 36 abdomen) with paired planning CT,
 0.35 T MR, beam parameters, and per-beam Geant4 Monte-Carlo dose. **The challenge dataset is
@@ -52,6 +59,18 @@ archive/     the full development campaign (~140 scripts, ~190 configs), kept fo
 reports/     the four per-task LNCS method reports (PDF + source)
 docs/        WHICH_FILE.md · MODEL_ZOO.md · TRAINING.md · INFERENCE.md
 ```
+
+## Installation
+
+```bash
+git clone https://github.com/wangkaiwan/PhyPriorNet && cd PhyPriorNet
+# install PyTorch matched to your CUDA first: https://pytorch.org/get-started/locally/
+pip install -r requirements.txt      # or: pip install -e .[eval]
+```
+
+Python >= 3.10, one CUDA GPU (>= 24 GB to train the base-48 networks; the released fast models
+run in ~5 GB). Scripts can be run from anywhere; they add the repository root to `sys.path`
+themselves.
 
 ## Reproducing our results
 

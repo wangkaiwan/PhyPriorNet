@@ -8,8 +8,9 @@ layout; edit `cache_dir`, `splits`, and `run_root` for your machine.
 
 ## 0. Environment and data
 
-- Python 3.11, PyTorch >= 2.10 (developed on 2.12) with CUDA, plus: `SimpleITK`, `numpy`,
-  `pyyaml`, `pymedphys` (gamma), `wandb` (optional).
+- Python >= 3.10 (developed on 3.11) and PyTorch >= 2.1 (developed on 2.12) with CUDA;
+  `pip install -r requirements.txt` covers the rest (SimpleITK, numpy, PyYAML, scipy, pymedphys
+  for gamma, optional wandb).
 - Official DoseRAD2026 training data, laid out as released:
   `<ROOT>/{photon,proton}/training/<patient>/{image/{ct.mha,mr.mha}, dose/, <patient>.json}` and
   `<ROOT>/beam_parameters.json`.
