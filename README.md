@@ -58,7 +58,7 @@ scripts/     the 14 scripts needed to reproduce the released models
 configs/released/  the 12 configs of the released models (paths as ${DATA_ROOT}/${WORKDIR})
 archive/     the full development campaign (~140 scripts, ~190 configs), kept for provenance
 reports/     the four per-task LNCS method reports (PDF + source)
-docs/        WHICH_FILE.md · MODEL_ZOO.md · TRAINING.md · INFERENCE.md
+docs/        WHICH_FILE.md · MODEL_ZOO.md · TRAINING.md · INFERENCE.md · CV_RESULTS.md (+ cv_results.csv)
 ```
 
 ## Installation
@@ -114,10 +114,19 @@ python examples/smoke_test.py     # synthetic phantom -> physics channels -> net
 | Proton-CT | 95.60 / 95.31 | 191.7 s / 101.1 s |
 | Proton-MRI | 79.34 / 79.08 | 188.8 s / 110 s |
 
-Internal 5-fold cross-validation on the 75 public patients: 93.4 / 91.1 / 96.7 / 87.4
-(photon-CT / photon-MRI / proton-CT / proton-MRI); details, ablations, and the mechanistic
-analyses (real-CT ceiling, range-error decomposition, fidelity non-predictiveness) are in the
-per-task reports under `reports/`.
+Out-of-fold 5-fold cross-validation on the 75 public training patients (plan-level local gamma):
+
+| Task | gamma 1%/1mm | gamma 3%/3mm |
+|---|---|---|
+| Photon-CT | 93.4 ± 1.1 | 99.65 ± 0.15 |
+| Photon-MRI | 91.3 ± 1.6 | 99.04 ± 0.40 |
+| Proton-CT | 96.9 ± 0.9 | 99.84 ± 0.12 |
+| Proton-MRI | 87.4 ± 2.1 | 98.86 ± 0.39 |
+
+Per-fold, per-site and per-patient values: [docs/CV_RESULTS.md](docs/CV_RESULTS.md) and
+[docs/cv_results.csv](docs/cv_results.csv). Ablations and the mechanistic analyses (real-CT
+ceiling, range-error decomposition, fidelity non-predictiveness) are in the per-task reports
+under `reports/`.
 
 ## Licence
 
