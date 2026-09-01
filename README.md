@@ -105,28 +105,60 @@ python examples/smoke_test.py     # synthetic phantom -> physics channels -> net
 4. **Which model to use**: [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) — per task, the
    highest-quality version and the fastest quality-gated version, with hidden-test metrics.
 
-## Results (DoseRAD2026 preliminary hidden test set)
+## Results
 
-| Task | γ 1%/1mm (quality / fast) | Runtime (quality / fast) |
+**Cross-validated on the 75 public training patients** (out-of-fold: each patient scored by the
+model of the fold that held it out; plan-level local gamma, 10% Rx cutoff). Thorax is the harder
+site throughout, and every task is above 98.8% at 3%/3mm, so the errors failing the strict
+criterion are small in magnitude and sit at steep gradients near lung-tissue interfaces.
+
+| Task | gamma 1%/1mm | gamma 3%/3mm | abdomen 1%/1mm | thorax 1%/1mm |
+|---|---|---|---|---|
+| Photon-CT | 93.4 ± 1.1 | 99.65 ± 0.15 | 95.2 | 91.8 |
+| Photon-MRI | 91.3 ± 1.6 | 99.04 ± 0.40 | 95.4 | 87.5 |
+| Proton-CT | 96.9 ± 0.9 | 99.84 ± 0.12 | 98.0 | 95.9 |
+| Proton-MRI | 87.4 ± 2.1 | 98.86 ± 0.39 | 91.3 | 83.7 |
+
+Per-fold and per-patient values: [docs/CV_RESULTS.md](docs/CV_RESULTS.md),
+[docs/cv_results.csv](docs/cv_results.csv). The submitted models were afterwards retrained on all
+75 patients, so scoring them on these patients would be in-sample and is not reported.
+
+**On the hidden preliminary test set**, for the two released versions per task:
+
+| Task | gamma 1%/1mm (quality / fast) | Runtime (quality / fast) |
 |---|---|---|
 | Photon-CT | 95.51 / 93.87 | 103.6 s / 45.4 s |
 | Photon-MRI | 84.11 / 82.90 | 94.8 s / 57.4 s |
 | Proton-CT | 95.60 / 95.31 | 191.7 s / 101.1 s |
 | Proton-MRI | 79.34 / 79.08 | 188.8 s / 110 s |
 
-Out-of-fold 5-fold cross-validation on the 75 public training patients (plan-level local gamma):
+### What the runtime means
 
-| Task | gamma 1%/1mm | gamma 3%/3mm |
-|---|---|---|
-| Photon-CT | 93.4 ± 1.1 | 99.65 ± 0.15 |
-| Photon-MRI | 91.3 ± 1.6 | 99.04 ± 0.40 |
-| Proton-CT | 96.9 ± 0.9 | 99.84 ± 0.12 |
-| Proton-MRI | 87.4 ± 2.1 | 98.86 ± 0.39 |
+Runtime is the wall-clock time of one scored evaluation job: model load, the per-beam-element
+loop, and writing every dose map. A job is a batch of beam elements, not one patient; in our
+scored jobs a photon job held on the order of 500 control points and a proton job 177 to 309
+beamlet dose maps. The per-element cost is the portable number:
 
-Per-fold, per-site and per-patient values: [docs/CV_RESULTS.md](docs/CV_RESULTS.md) and
-[docs/cv_results.csv](docs/cv_results.csv). Ablations and the mechanistic analyses (real-CT
-ceiling, range-error decomposition, fidelity non-predictiveness) are in the per-task reports
-under `reports/`.
+| Task | version | per beam element | example job | what that job is |
+|---|---|---|---|---|
+| Photon-CT | quality | ~0.19 s / control point | 103.6 s | ~540 control points, i.e. one full VMAT plan (two arcs at ~180 segments each) |
+| Photon-CT | fast | ~0.08 s / control point | 45.4 s | the same ~540 control points |
+| Photon-MRI | quality | ~0.17 s / control point | 94.8 s | ~540 control points plus ~2 s one-off MR-to-density synthesis |
+| Photon-MRI | fast | ~0.10 s / control point | 57.4 s | the same, with the distilled network |
+| Proton-CT | quality | ~0.62 s / dose map | 191.7 s | 309 beamlet dose maps |
+| Proton-CT | fast | ~0.20 s / dose map | 101.1 s | 309 beamlet dose maps, ~27 GB written (measured 62.8 s for 309 maps) |
+| Proton-MRI | quality | ~0.61 s / dose map | 188.8 s | 309 beamlet dose maps plus ~2 s synthesis |
+| Proton-MRI | fast | ~0.36 s / dose map | 110 s | the same, batched engine |
+
+For clinical intuition: a photon control point is one MLC segment of a VMAT arc, so the fast
+photon model computes a complete two-arc plan in under a minute and a single segment in about
+0.1 s, fast enough to recompute dose while a therapist reviews the image of the day. A proton
+beamlet is one energy-and-spot element; clinical spot maps hold thousands, so a full plan is
+several minutes, dominated by writing per-beamlet dose volumes on the native 1x1x3 mm grid rather
+than by the network.
+
+Ablations and the mechanistic analyses (real-CT ceiling, range-error decomposition, fidelity
+non-predictiveness) are in the per-task reports under `reports/`.
 
 ## Licence
 
