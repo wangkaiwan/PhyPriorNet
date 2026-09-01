@@ -9,6 +9,22 @@ University of Colorado Anschutz Medical Campus.
 > **Model weights are available upon request**: contact Kai Wang (kai.2.wang@cuanschutz.edu).
 > See [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) for the released versions and their metrics.
 
+## The challenge
+
+| Resource | Link |
+|---|---|
+| Challenge website | https://doserad2026.grand-challenge.org |
+| Final submission requirements | https://doserad2026.grand-challenge.org/final-submission-requirements/ |
+| Official code and evaluation repositories | https://github.com/orgs/DoseRAD2026/repositories |
+| Dataset download (Zenodo, 864 GB; HuggingFace mirror linked there) | https://doi.org/10.5281/zenodo.19347848 |
+| Dataset paper | https://doi.org/10.48550/arXiv.2604.12778 |
+| Underlying CT-MR cohort (SynthRAD2025) | https://doi.org/10.1002/mp.17981 |
+
+The public training set used here is 75 patients (39 thorax, 36 abdomen) with paired planning CT,
+0.35 T MR, beam parameters, and per-beam Geant4 Monte-Carlo dose. **The challenge dataset is
+released under CC BY-NC 4.0 (non-commercial); this repository distributes code and model weights
+only, no challenge data, and any use of the data remains subject to the challenge licence.**
+
 ## Method in one paragraph
 
 For each beam element (photon MLC control point or proton beamlet), an analytical,
