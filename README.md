@@ -76,6 +76,16 @@ Internal 5-fold cross-validation on the 75 public patients: 93.4 / 91.1 / 96.7 /
 analyses (real-CT ceiling, range-error decomposition, fidelity non-predictiveness) are in the
 per-task reports under `reports/`.
 
+## Licence
+
+Code in this repository is licensed under the **GNU General Public License v3.0** (see
+[`LICENSE`](LICENSE)): free to use, modify and redistribute, provided derivative works are
+released under the same licence. For use under different terms, contact the corresponding author.
+
+Model weights are distributed **on request** (kai.2.wang@cuanschutz.edu). Note that they were
+trained on the DoseRAD2026 dataset, which is released under CC BY-NC 4.0; the dataset licence
+governs any use of the data, and this repository contains no challenge data.
+
 ## Citation
 
 Until a preprint is up, please cite the challenge reports:
