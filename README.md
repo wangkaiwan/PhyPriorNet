@@ -45,10 +45,11 @@ and streaming writers — every speed lever gated to lose no accuracy.
 doserad/     core package: differentiable physics operators, DoseUNet3D, data pipeline
 accel/       deployment acceleration: batched proton engine v2, GPU channel builders
 container/   the four Grand-Challenge invoke containers (photon/proton × CT/MRI)
-scripts/     training, cache precompute, evaluation (official-metric harness)
-configs/     every experiment's YAML (the released models' configs included)
+scripts/     the 14 scripts needed to reproduce the released models
+configs/released/  the 12 configs of the released models (paths as ${DATA_ROOT}/${WORKDIR})
+archive/     the full development campaign (~140 scripts, ~190 configs), kept for provenance
 reports/     the four per-task LNCS method reports (PDF + source)
-docs/        MODEL_ZOO.md · TRAINING.md · INFERENCE.md
+docs/        WHICH_FILE.md · MODEL_ZOO.md · TRAINING.md · INFERENCE.md
 ```
 
 ## Reproducing our results
@@ -56,10 +57,12 @@ docs/        MODEL_ZOO.md · TRAINING.md · INFERENCE.md
 1. **Inference with released weights**: [docs/INFERENCE.md](docs/INFERENCE.md) — download a
    bundle, build the container, run on the Grand-Challenge job layout. Bundles were extracted
    from the exact Docker images that produced our leaderboard entries.
-2. **Training from scratch**: [docs/TRAINING.md](docs/TRAINING.md) — per-task recipes
+2. **Which file do I run?**: [docs/WHICH_FILE.md](docs/WHICH_FILE.md) — what each of the 14
+   scripts and 12 configs does, in run order, with a minimal single-task walkthrough.
+3. **Training from scratch**: [docs/TRAINING.md](docs/TRAINING.md) — per-task recipes
    (cache precompute → base training → finetunes → distillation), with the pitfalls we hit
    documented inline.
-3. **Which model to use**: [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) — per task, the
+4. **Which model to use**: [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) — per task, the
    highest-quality version and the fastest quality-gated version, with hidden-test metrics.
 
 ## Results (DoseRAD2026 preliminary hidden test set)
@@ -82,9 +85,10 @@ Code in this repository is licensed under the **GNU General Public License v3.0*
 [`LICENSE`](LICENSE)): free to use, modify and redistribute, provided derivative works are
 released under the same licence. For use under different terms, contact the corresponding author.
 
-Model weights are distributed **on request** (kai.2.wang@cuanschutz.edu). Note that they were
-trained on the DoseRAD2026 dataset, which is released under CC BY-NC 4.0; the dataset licence
-governs any use of the data, and this repository contains no challenge data.
+Model weights are distributed **on request for non-commercial research use**
+(kai.2.wang@cuanschutz.edu); commercial use of the weights requires a separate agreement. They
+were trained on the DoseRAD2026 dataset, which is released under CC BY-NC 4.0; the dataset
+licence governs any use of the data, and this repository contains no challenge data.
 
 ## Citation
 

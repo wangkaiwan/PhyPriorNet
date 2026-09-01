@@ -1,0 +1,81 @@
+# Which script / config do I need?
+
+The repository keeps only the files needed to reproduce the four submitted models in `scripts/`
+and `configs/released/`. Everything else from the development campaign (about 140 scripts and
+190 configs: ablations, probes, dead ends, one-off analyses) is preserved unedited under
+`archive/` for provenance; you do not need any of it to reproduce our results.
+
+## Path placeholders
+
+The released configs use two placeholders. Substitute them (or export them and expand with
+`envsubst`) before running:
+
+- `${DATA_ROOT}` — the official challenge data, e.g. `/data/DoseRad2026_raw`, containing
+  `photon/training/<pid>/...`, `proton/training/<pid>/...`, and `beam_parameters.json`.
+- `${WORKDIR}` — your scratch space for caches, splits and run outputs (needs ~1 TB if you build
+  all caches; ~250 GB for a single task).
+
+## The 14 scripts
+
+| Script | What it does | Used by |
+|---|---|---|
+| `build_splits.py` | writes the patient-level split JSON (all-75 or k-fold) | all tasks, run first |
+| `precompute_photon_crops_skinentry.py` | photon channel + dose crop cache (per control point) | photon-CT, photon-MRI |
+| `precompute_photon_crops_sct_m24.py` | same channels but on synthesizer-derived densities | photon-MRI fast student only |
+| `precompute_proton.py` | proton WEPL + dose crop cache (per beamlet) | proton-CT, proton-MRI |
+| `precompute_proton_prior.py` | GPU Hong pencil-beam prior cache | proton-CT, proton-MRI |
+| `precompute_coarse_ct.py` | tissue-class coarse CT from MR (synthesizer stage 1 output) | MRI tasks |
+| `train.py` | photon dose-network trainer (CT task); reads `init_from:` | photon-CT |
+| `train_dose_proton.py` | proton dose-network trainer (CT task) | proton-CT |
+| `train_dose_e2e.py` | photon MR-to-dose end-to-end trainer (synthesizer + dose net) | photon-MRI |
+| `train_dose_proton_e2e.py` | proton MR-to-dose end-to-end trainer | proton-MRI |
+| `train_sct_classifier.py` | MR tissue classifier (use the intensity-shift augmentation flags) | MRI tasks |
+| `train_sct_refiner.py` | sCT refiner pretraining (also uses public SynthRAD2025 pairs) | MRI tasks |
+| `distill_dose_photon.py` | knowledge distillation; reads `init_student:` / `teacher_ckpt:` | fast photon models |
+| `eval_official_held16.py` | our reimplementation of the official metrics on a fixed cohort | all tasks |
+
+Trainer/config key pairing (a real bug we hit): `train.py` reads `init_from:`,
+`distill_dose_photon.py` reads `init_student:`. Unknown YAML keys are silently ignored, so always
+confirm a warm start from the first logged loss.
+
+## The 12 released configs
+
+Run them in the order listed; each row's output is the next row's starting point.
+
+**Photon-CT** (quality model = step 2; fast model = steps 3-4)
+1. `all75_p1_photonct.yaml` — base-48 dose network from scratch (~120k steps)
+2. `all75_p2_ftg.yaml` — finetune (this is the submitted quality model)
+3. `distill_photonct_b32_from4018.yaml` — distil to base-32 (200k, teacher + GT)
+4. `distill_photonct_b32_from4018_Dft.yaml` — GT-only finetune of the student (40k)
+
+**Photon-MRI** (quality model = step 2; fast model = step 3 stitched into step 2)
+1. `all75_r3_protonmri.yaml` is *not* used here; start from the photon-CT network plus a
+   pretrained classifier/refiner
+2. `m24S2_p4_mmB.yaml` — dose-aware joint training, multi-modal round (submitted quality model)
+3. `distill_photonmri_b32_sctft.yaml` — domain-adapt the base-32 student on synthesis-domain
+   channels, then merge `synth.*` (from step 2) with `dose.*` (the student) into one checkpoint
+4. `m24S2_p4_mmB_b32dose.yaml` — the deploy-time config describing that merged network
+
+**Proton-CT** (quality model = step 2; fast engine = step 3)
+1. `all75_r1_protonct.yaml` — base-48 with WEPL + pencil-beam prior channels
+2. `all75_r2_ft.yaml` — finetune on the GPU prior (train = deploy; submitted quality model)
+3. `all75_r2_ft_v3physics.yaml` — convention-consistency finetune for the batched engine
+
+**Proton-MRI**
+1. `all75_r3_protonmri.yaml` — dose-aware end-to-end (density-direct output, WEPL-consistency loss)
+2. `all75_r3ft2_mraug_protonmri.yaml` — shift-robust finetune (submitted model)
+
+## Minimal path for a single task
+
+Example, photon-CT quality model:
+
+```bash
+export DATA_ROOT=/path/to/DoseRad2026_raw WORKDIR=/path/to/workdir
+python scripts/build_splits.py --all75                       # -> $WORKDIR/splits_all75.json
+python scripts/precompute_photon_crops_skinentry.py          # -> $WORKDIR/cache/crops/... (~350 GB, margin 24)
+python scripts/train.py --config configs/released/all75_p1_photonct.yaml
+python scripts/train.py --config configs/released/all75_p2_ftg.yaml
+python scripts/eval_official_held16.py photon_ct             # official-metric check
+```
+
+Each script prints its own arguments with `--help`; the headers document the expected inputs.

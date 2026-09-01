@@ -1,0 +1,45 @@
+exp_name: distill_photonct_b32_from4018
+fold: all
+modality: ct
+
+# STUDENT architecture (base 32 vs teacher's 48 -> 2.1x faster net, 7.6M vs 17.1M params)
+in_ch: 6
+base_ch: 32
+levels: 4
+bottleneck: dilated
+
+# distillation
+teacher_ckpt: ${WORKDIR}/runs/docker_extracted/photon_ct_docker.pt
+distill_w: 0.5            # loss = weighted_l1(student, GT) + 0.5 * weighted_l1(student, teacher)
+
+# data / channels (identical to teacher recipe)
+add_naive: true
+augment: false
+naive_skin_gate: true
+patch: [128, 128, 128]
+batch_size: 2            # student + frozen teacher both at 128^3 => batch4 OOM'd (~25GB) alongside a
+                         # 6GB co-tenant; batch2 (~8GB) is the safe validated choice.
+fg_prob: 0.7
+
+# loss weights (identical to ftg_skinentry_photonct_f0)
+hi_frac: 0.1
+hi_w: 10.0
+grad_w: 3.0
+het_w: 4.0
+lung_w: 2.0
+lung_lo: 0.02
+lung_hi: 0.6
+
+# schedule — from scratch, conservative LR (small from the start, per preference); dense KD
+# supervision should still converge. Long ceiling with frequent checkpoints for early-stop-on-gamma.
+max_steps: 200000
+lr: 2.0e-04              # OneCycle peak (build_optim: 5% warmup then cosine down)
+weight_decay: 0.0001
+ckpt_every: 10000
+log_every: 200
+
+cache_dir: ${WORKDIR}/cache/crops/photon_skinentry_m24
+splits: ${WORKDIR}/splits_all75.json
+run_root: ${WORKDIR}/runs
+wandb: true
+wandb_project: doserad2026

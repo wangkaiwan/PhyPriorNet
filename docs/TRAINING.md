@@ -23,13 +23,13 @@ layout; edit `cache_dir`, `splits`, and `run_root` for your machine.
 python scripts/precompute_photon_crops_skinentry.py            # see script header for arguments
 
 # 2) Train the base-48 network (~120k steps), then finetune
-python scripts/train.py --config configs/experiments/all75/all75_p1_photonct.yaml
-python scripts/train.py --config configs/experiments/all75/all75_p2_ftg.yaml
+python scripts/train.py --config configs/released/all75_p1_photonct.yaml
+python scripts/train.py --config configs/released/all75_p2_ftg.yaml
 
 # 3) (fast version) Distill to base-32 with the D-recipe:
 #    stage 1: 200k steps of L1(GT) + 0.5*L1(teacher); stage 2: 40k GT-only finetune
-python scripts/distill_dose_photon.py --config configs/experiments/all75/distill_photonct_b32_from4018.yaml
-python scripts/distill_dose_photon.py --config configs/experiments/all75/distill_photonct_b32_from4018_Dft.yaml
+python scripts/distill_dose_photon.py --config configs/released/distill_photonct_b32_from4018.yaml
+python scripts/distill_dose_photon.py --config configs/released/distill_photonct_b32_from4018_Dft.yaml
 ```
 
 Key config semantics: `distill_dose_photon.py` reads `init_student:`/`teacher_ckpt:`;
@@ -45,12 +45,12 @@ python scripts/train_sct_classifier.py ...    # see script header; the released 
 python scripts/train_sct_refiner.py ...
 
 # 2) Joint dose-aware training (synthesizer + dose net, warm-started from Photon-CT)
-python scripts/train_dose_e2e.py --config configs/experiments/all75/all75_p3_photonmri.yaml
-python scripts/train_dose_e2e.py --config configs/experiments/all75/all75_p4_mmB.yaml   # multi-modal round
+python scripts/train_dose_e2e.py --config configs/released/all75_p3_photonmri.yaml
+python scripts/train_dose_e2e.py --config configs/released/all75_p4_mmB.yaml   # multi-modal round
 
 # 3) (fast version) Domain-adapt the base-32 student to synthesis-domain channels:
 python scripts/precompute_photon_crops_sct_m24.py   # channels on the deployed front end's densities
-python scripts/distill_dose_photon.py --config configs/experiments/all75/distill_photonmri_b32_sctft.yaml
+python scripts/distill_dose_photon.py --config configs/released/distill_photonmri_b32_sctft.yaml
 # then stitch the student into the E2E checkpoint (synth.* from the deployed E2E + dose.* from the student)
 ```
 
@@ -65,12 +65,12 @@ python scripts/precompute_proton.py
 python scripts/precompute_proton_prior.py
 
 # 2) Train base-48 (~120k) and finetune on the GPU pencil-beam prior (train = deploy)
-python scripts/train_dose_proton.py --config configs/experiments/all75/all75_r1_protonct.yaml
-python scripts/train_dose_proton.py --config configs/experiments/all75/all75_r2_ft.yaml
+python scripts/train_dose_proton.py --config configs/released/all75_r1_protonct.yaml
+python scripts/train_dose_proton.py --config configs/released/all75_r2_ft.yaml
 
 # 3) (fast version) Convention-consistency finetune for the batched engine
 #    (the orthographic per-beam WEPL differs from the per-voxel march by ~0.18 g/cm^2 mean abs)
-python scripts/train_dose_proton.py --config configs/experiments/all75/all75_r2_ft_v3physics.yaml
+python scripts/train_dose_proton.py --config configs/released/all75_r2_ft_v3physics.yaml
 ```
 
 The batched engine itself is `accel/proton_engine_v2.py`, enabled at deploy time with
@@ -82,9 +82,9 @@ The batched engine itself is `accel/proton_engine_v2.py`, enabled at deploy time
 # 1) Classifier/refiner as in Photon-MRI (shared front end; classifier must run sliding-window
 #    at the native grid in deployment)
 # 2) Joint dose-aware E2E with density-direct synthesis and the WEPL-consistency loss
-python scripts/train_dose_proton_e2e.py --config configs/experiments/all75/all75_r3_protonmri.yaml
+python scripts/train_dose_proton_e2e.py --config configs/released/all75_r3_protonmri.yaml
 # 3) Shift-robust finetune (the single largest held-out improvement of our campaign)
-python scripts/train_dose_proton_e2e.py --config configs/experiments/all75/all75_r3ft2_mraug_protonmri.yaml
+python scripts/train_dose_proton_e2e.py --config configs/released/all75_r3ft2_mraug_protonmri.yaml
 ```
 
 ## 5. Evaluation
