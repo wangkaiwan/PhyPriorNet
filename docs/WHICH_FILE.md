@@ -38,7 +38,7 @@ Trainer/config key pairing (a real bug we hit): `train.py` reads `init_from:`,
 `distill_dose_photon.py` reads `init_student:`. Unknown YAML keys are silently ignored, so always
 confirm a warm start from the first logged loss.
 
-## The 12 released configs
+## The 14 released configs
 
 Run them in the order listed; each row's output is the next row's starting point.
 
@@ -49,8 +49,8 @@ Run them in the order listed; each row's output is the next row's starting point
 4. `distill_photonct_b32_from4018_Dft.yaml` — GT-only finetune of the student (40k)
 
 **Photon-MRI** (quality model = step 2; fast model = step 3 stitched into step 2)
-1. `all75_r3_protonmri.yaml` is *not* used here; start from the photon-CT network plus a
-   pretrained classifier/refiner
+1. `m24S2_p3_photonmri.yaml` — dose-aware joint stage, warm-started from the photon-CT network
+   plus the pretrained classifier/refiner
 2. `m24S2_p4_mmB.yaml` — dose-aware joint training, multi-modal round (submitted quality model)
 3. `distill_photonmri_b32_sctft.yaml` — domain-adapt the base-32 student on synthesis-domain
    channels, then merge `synth.*` (from step 2) with `dose.*` (the student) into one checkpoint

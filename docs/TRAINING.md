@@ -45,8 +45,8 @@ python scripts/train_sct_classifier.py ...    # see script header; the released 
 python scripts/train_sct_refiner.py ...
 
 # 2) Joint dose-aware training (synthesizer + dose net, warm-started from Photon-CT)
-python scripts/train_dose_e2e.py --config configs/released/all75_p3_photonmri.yaml
-python scripts/train_dose_e2e.py --config configs/released/all75_p4_mmB.yaml   # multi-modal round
+python scripts/train_dose_e2e.py --config configs/released/m24S2_p3_photonmri.yaml   # dose-aware joint stage
+python scripts/train_dose_e2e.py --config configs/released/m24S2_p4_mmB.yaml         # multi-modal round (submitted)
 
 # 3) (fast version) Domain-adapt the base-32 student to synthesis-domain channels:
 python scripts/precompute_photon_crops_sct_m24.py   # channels on the deployed front end's densities
