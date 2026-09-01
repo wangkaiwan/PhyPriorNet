@@ -1,6 +1,8 @@
 # Training Guide
 
-End-to-end recipes to reproduce every released model. All hyperparameters live in YAML configs
+End-to-end recipes to reproduce every released model. To run any of these chains with a single
+command, use `python run_task.py <task> [--with-fast]` (see docs/WHICH_FILE.md); the sections
+below document what that wrapper executes, stage by stage. All hyperparameters live in YAML configs
 under `configs/`; no training script hardcodes them. Paths inside the configs point to our local
 layout; edit `cache_dir`, `splits`, and `run_root` for your machine.
 

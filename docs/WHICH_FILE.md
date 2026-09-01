@@ -5,6 +5,21 @@ and `configs/released/`. Everything else from the development campaign (about 14
 190 configs: ablations, probes, dead ends, one-off analyses) is preserved unedited under
 `archive/` for provenance; you do not need any of it to reproduce our results.
 
+## Shortcut: one command per task
+
+If you do not want to think about stage order at all:
+
+```bash
+export DATA_ROOT=/path/to/DoseRad2026_raw WORKDIR=/path/to/workdir
+python run_task.py <task> [--with-fast] [--dry-run] [--from-stage N] [--force]
+```
+
+`run_task.py` is a thin dispatcher over the same scripts and configs listed below, so the result
+is identical to running the stages yourself. It prints the plan, skips stages whose output
+already exists, and on failure tells you how to resume. Start with `--dry-run` to see what a task
+would cost (the cache stages are the expensive ones). The rest of this document explains what the
+individual pieces do, which you need when you want to deviate from our recipe.
+
 ## Path placeholders
 
 The released configs use two placeholders. Substitute them (or export them and expand with
@@ -15,7 +30,7 @@ The released configs use two placeholders. Substitute them (or export them and e
 - `${WORKDIR}` — your scratch space for caches, splits and run outputs (needs ~1 TB if you build
   all caches; ~250 GB for a single task).
 
-## The 14 scripts
+## The 15 scripts
 
 | Script | What it does | Used by |
 |---|---|---|
@@ -33,6 +48,7 @@ The released configs use two placeholders. Substitute them (or export them and e
 | `train_sct_refiner.py` | sCT refiner pretraining (also uses public SynthRAD2025 pairs) | MRI tasks |
 | `distill_dose_photon.py` | knowledge distillation; reads `init_student:` / `teacher_ckpt:` | fast photon models |
 | `eval_official_held16.py` | our reimplementation of the official metrics on a fixed cohort | all tasks |
+| `stitch_e2e.py` | merges a separately trained dose network into an end-to-end MRI checkpoint | photon-MRI fast model |
 
 Trainer/config key pairing (a real bug we hit): `train.py` reads `init_from:`,
 `distill_dose_photon.py` reads `init_student:`. Unknown YAML keys are silently ignored, so always

@@ -42,6 +42,7 @@ and streaming writers — every speed lever gated to lose no accuracy.
 ## Repository layout
 
 ```
+run_task.py   one-command training per task (chains all stages)
 doserad/     core package: differentiable physics operators, DoseUNet3D, data pipeline
 accel/       deployment acceleration: batched proton engine v2, GPU channel builders
 container/   the four Grand-Challenge invoke containers (photon/proton × CT/MRI)
@@ -53,6 +54,19 @@ docs/        WHICH_FILE.md · MODEL_ZOO.md · TRAINING.md · INFERENCE.md
 ```
 
 ## Reproducing our results
+
+0. **The short path**: one command trains a whole task end to end, chaining every stage with the
+   released configs (identical to running them by hand):
+
+   ```bash
+   export DATA_ROOT=/path/to/DoseRad2026_raw WORKDIR=/path/to/workdir
+   python run_task.py photon_ct --dry-run     # see the plan first
+   python run_task.py photon_ct               # quality model
+   python run_task.py photon_ct --with-fast   # plus the distilled fast model
+   ```
+
+   Completed stages are skipped on re-run, and a failed stage prints the exact
+   `--from-stage N` command to resume. Tasks: `photon_ct`, `photon_mri`, `proton_ct`, `proton_mri`.
 
 1. **Inference with released weights**: [docs/INFERENCE.md](docs/INFERENCE.md) — download a
    bundle, build the container, run on the Grand-Challenge job layout. Bundles were extracted
