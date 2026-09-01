@@ -15,6 +15,8 @@ Custom in-process loop (no DataLoader): per step one patient -> one sCT(2mm)->na
 over k_cps beamlets) -> per beamlet sample a patch, compute diff channels on the patch bbox, dose net, loss.
 """
 from __future__ import annotations
+
+import os
 import argparse, json, os, sys, time, random
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # train_dose_e2e import
@@ -40,8 +42,8 @@ from doserad.io.mha import load_mha
 from doserad.train.loop import build_optim, _ema_update, _save, _init_wandb, _wlog
 from train_dose_e2e import E2E, CT_LO, CT_HI, _pad16, sct_anchor_loss
 
-PROTON_ROOT = "/data/kwang/DoseRad2026_raw/proton/training"
-PHOTON_ROOT = "/data/kwang/DoseRad2026_raw/photon/training"   # 2mm MR/CT the synth was trained on
+PROTON_ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/proton/training")
+PHOTON_ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")   # 2mm MR/CT the synth was trained on
 _PCS = torch.tensor(_P_CH_SCALE_PRIOR, dtype=torch.float32).view(-1, 1, 1, 1)
 
 
@@ -91,7 +93,7 @@ def main():
     skin_entry = bool(cfg.get("skin_entry", False))
     pb_fn = proton_pb_dose_gpu_skinentry if skin_entry else proton_pb_dose_gpu
     pm = ProtonMachineData(device=dev)
-    machine = load_photon_machine("/data/kwang/DoseRad2026_raw/beam_parameters.json")
+    machine = load_photon_machine((os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/beam_parameters.json"))
     anchors = machine.hu_anchors
     run_dir = Path(cfg["run_root"]) / cfg["exp_name"]; run_dir.mkdir(parents=True, exist_ok=True)
     cache = Path(cfg["cache_dir"])

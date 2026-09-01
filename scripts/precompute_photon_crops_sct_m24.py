@@ -25,12 +25,12 @@ from doserad.physics.channels_skinentry import photon_channels_skinentry
 from doserad.physics.machine import load_photon_machine
 from container.mri_synth import load_classifier, synth_density
 
-ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
-SRC = Path("/home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24")
-OUT = Path("/home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_sct_m24")
-E2E_STATE = "/home/kaiwang/doserad2026_workdir/runs/mm_ftm16_photonmri/state.pt"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
+SRC = Path((os.environ.get("WORKDIR", "./workdir") + "/cache/crops/photon_skinentry_m24"))
+OUT = Path((os.environ.get("WORKDIR", "./workdir") + "/cache/crops/photon_skinentry_sct_m24"))
+E2E_STATE = (os.environ.get("WORKDIR", "./workdir") + "/runs/mm_ftm16_photonmri/state.pt")
 E2E_CFG = "configs/experiments/all75/m24S2_p4_mmB.yaml"
-CLF = "/data/kwang/sct_classify_runs/clf_whole/best.pt"
+CLF = (os.environ.get("WORKDIR", "./workdir") + "/sct_runs" + "/clf_whole/best.pt")
 DEV = "cuda"
 FORCE = bool(os.environ.get("DOSERAD_FORCE"))
 MACHINE = load_photon_machine(f"{ROOT}/beam_parameters.json")

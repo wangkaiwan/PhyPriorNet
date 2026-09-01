@@ -8,9 +8,11 @@ stage-2 refiner (classify-then-regress). Classification is field-robust, so we t
 (341 AB+TH); the field-sensitive HU refiner trains on 0.35T only.
 
     CUDA_VISIBLE_DEVICES=0 conda run -n doserad python scripts/train_sct_classifier.py \
-        --out /data/kwang/sct_classify_runs/clf_v1 --epochs 200
+        --out $WORKDIR/sct_runs/clf --epochs 200
 """
 from __future__ import annotations
+
+import os
 import argparse, json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +26,7 @@ from monai.inferers import sliding_window_inference
 from train_sct_paired import norm_mr, load_arr   # reuse v4 MR norm (pct 1/99) + axis convention
 import sct_aug   # approved sCT-front-end augmentation (3-axis flip + axial rot NEAREST-label + MR-only intensity)
 
-DATA = "/home/kaiwang/doserad2026_workdir/sct_data_2mm.json"
+DATA = (os.environ.get("WORKDIR", "./workdir") + "/sct_data_2mm.json")
 # CT-HU band edges -> class id (air, lung, soft, bone); see sct_manifest classes
 BANDS = [-700.0, -300.0, 200.0]   # <-700 air | -700..-300 lung | -300..200 soft | >200 bone
 N_CLS = 4

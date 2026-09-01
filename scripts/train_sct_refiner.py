@@ -7,7 +7,7 @@ train/test mismatch that wrecked sliding-window inference of full-volume-trained
 L1 (bone & lung up-weighted) folds in lever 3. Trained on 0.35T (Center-B) only -> field-matched HU.
 
     CUDA_VISIBLE_DEVICES=0 conda run -n doserad python scripts/train_sct_refiner.py \
-        --out /data/kwang/sct_refine_runs/ref_v1 --coarse-dir /data/kwang/doserad_cache_archive/coarse_ct_v1
+        --out $WORKDIR/sct_runs/refiner --coarse-dir $WORKDIR/cache/coarse_ct
 
 PERF: the per-step cost is single-threaded CPU (load-once cache + full-volume augmentation), so with the
 inline loop the GPU sits ~90% idle waiting for the CPU. Pass --workers N to move sampling+aug into N
@@ -17,6 +17,8 @@ copy-on-write — workers only READ them (aug returns fresh copies), so RAM is n
 --workers 0 (default) keeps the exact original inline behaviour.
 """
 from __future__ import annotations
+
+import os
 import argparse, json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,7 +32,7 @@ from monai.inferers import sliding_window_inference
 from train_sct_paired import norm_mr, load_arr
 import sct_aug   # approved sCT-front-end augmentation (all 3 vols continuous -> LINEAR; MR-only intensity)
 
-DATA = "/home/kaiwang/doserad2026_workdir/sct_data_2mm.json"
+DATA = (os.environ.get("WORKDIR", "./workdir") + "/sct_data_2mm.json")
 _PATCH = None
 CT_LO, CT_HI = -1000.0, 2000.0
 _T_BODY = (-500.0 - CT_LO) / (CT_HI - CT_LO)

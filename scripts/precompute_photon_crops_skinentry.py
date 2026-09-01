@@ -15,9 +15,9 @@ from doserad.io.mha import load_mha
 from doserad.physics.channels_skinentry import photon_channels_skinentry
 from doserad.physics.machine import load_photon_machine
 
-ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
 OUT_ROOT = Path(os.environ.get("DOSERAD_SKINENTRY_OUT",
-                "/home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_ssd"))
+                (os.environ.get("WORKDIR", "./workdir") + "/cache/crops/photon_skinentry_ssd")))
 MACHINE = load_photon_machine(f"{ROOT}/beam_parameters.json")
 MARGIN = 8
 FORCE = bool(os.environ.get("DOSERAD_FORCE"))

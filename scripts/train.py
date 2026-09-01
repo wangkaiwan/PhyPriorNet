@@ -3,6 +3,8 @@ Usage: conda run -n doserad python scripts/train.py --config configs/experiments
 """
 from __future__ import annotations
 
+import os
+
 import argparse
 import json
 from pathlib import Path
@@ -15,7 +17,7 @@ from doserad.data.index import build_index
 from doserad.model.unet3d import DoseUNet3D
 from doserad.train.loop import build_optim, train_steps
 
-ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
 
 
 def main():

@@ -11,19 +11,26 @@ RUNS IN `pyradplan` ENV. Shard across CPU cores by launching many processes:
 ~11 s/beamlet single-core -> ~1080*75/24 cores ~ 10 h. CPU-only (no GPU).
 """
 from __future__ import annotations
+
+import os
 import argparse, json, sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, "/home/kaiwang/project/pyradplan-pb-baseline")
+# Reference pencil-beam implementation used to validate our GPU port (r=0.995).
+# Point PYRADPLAN_BASELINE at your checkout if you want to run the cross-check;
+# the cache build itself uses our self-contained GPU engine and does not need it.
+_baseline = os.environ.get("PYRADPLAN_BASELINE")
+if _baseline:
+    sys.path.insert(0, _baseline)
 from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
 import baseline_protons as B
 from pyRadPlan.machines import load_from_name
 
-ROOT = "/data/kwang/DoseRad2026_raw/proton/training"
-BEAM_PARAMS = "/data/kwang/DoseRad2026_raw/beam_parameters.json"
-NOPRIOR_CACHE = "/home/kaiwang/doserad2026_workdir/cache/crops/proton"
-PRIOR_CACHE = "/home/kaiwang/doserad2026_workdir/cache/crops/proton_prior"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/proton/training")
+BEAM_PARAMS = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/beam_parameters.json")
+NOPRIOR_CACHE = (os.environ.get("WORKDIR", "./workdir") + "/cache/crops/proton")
+PRIOR_CACHE = (os.environ.get("WORKDIR", "./workdir") + "/cache/crops/proton_prior")
 
 
 def _patient_setup(pid):

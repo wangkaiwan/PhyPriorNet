@@ -7,6 +7,8 @@ faster net at held gamma. New file — does NOT modify the read-only CT dose pip
       --config configs/experiments/cv/distill_photonct_b32_f0.yaml [--resume]
 """
 from __future__ import annotations
+
+import os
 import argparse, json, math
 from pathlib import Path
 
@@ -20,7 +22,7 @@ from doserad.model.unet3d import DoseUNet3D
 from doserad.losses.dose_loss import weighted_l1
 from doserad.train.loop import build_optim, _ema_update, _save, _init_wandb, _wlog
 
-ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
 
 
 def _load_teacher(ckpt, dev):

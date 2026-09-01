@@ -6,10 +6,12 @@ stage-2 whole-image refiner (input = [MR, coarse CT]); the refiner learns the fi
 of a correctly-*located* tissue map instead of hallucinating bone/lung density from scratch.
 
     CUDA_VISIBLE_DEVICES=0 conda run -n doserad python scripts/precompute_coarse_ct.py \
-        --clf /data/kwang/sct_classify_runs/clf_v1/best.pt \
-        --out /data/kwang/doserad_cache_archive/coarse_ct_v1
+        --clf $WORKDIR/sct_runs/clf/best.pt \
+        --out $WORKDIR/cache/coarse_ct
 """
 from __future__ import annotations
+
+import os
 import argparse, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +23,7 @@ from monai.inferers import sliding_window_inference
 from train_sct_paired import norm_mr, load_arr
 from train_sct_classifier import model, N_CLS
 
-DATA = "/home/kaiwang/doserad2026_workdir/sct_data_2mm.json"
+DATA = (os.environ.get("WORKDIR", "./workdir") + "/sct_data_2mm.json")
 
 
 @torch.no_grad()

@@ -1,14 +1,16 @@
 """Build splits_final.json (5-fold, patient-level, site-stratified)."""
 from __future__ import annotations
 
+import os
+
 import json
 from pathlib import Path
 
 from doserad.data.index import patient_site
 from doserad.data.splits import make_kfold_splits
 
-DEFAULT_ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
-OUT = Path("/home/kaiwang/doserad2026_workdir/splits_final.json")
+DEFAULT_ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
+OUT = Path((os.environ.get("WORKDIR", "./workdir") + "/splits_final.json"))
 
 
 def main(root: str = DEFAULT_ROOT) -> None:

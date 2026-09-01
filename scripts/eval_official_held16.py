@@ -16,17 +16,17 @@ REPO = str(Path(__file__).resolve().parents[1]); sys.path.insert(0, REPO); sys.p
 TASK = sys.argv[1]
 NPID = int(sys.argv[2]) if len(sys.argv) > 2 else 16
 MARGIN = os.environ.get("DOSERAD_PHOTON_MARGIN", "24")
-FROZEN = json.load(open("/home/kaiwang/doserad2026_workdir/eval_cohort_frozen.json"))
+FROZEN = json.load(open((os.environ.get("WORKDIR", "./workdir") + "/eval_cohort_frozen.json")))
 PIDS = FROZEN["held16"][:NPID]
-RUNS = "/home/kaiwang/doserad2026_workdir/runs"
-CLF = "/data/kwang/sct_classify_runs/clf_whole/best.pt"
-MACH_PHOTON = "/data/kwang/DoseRad2026_raw/photon/training/beam_parameters.json"
-PHOTON_ROOT = "/data/kwang/DoseRad2026_raw/photon/training"
+RUNS = (os.environ.get("WORKDIR", "./workdir") + "/runs")
+CLF = (os.environ.get("WORKDIR", "./workdir") + "/sct_runs" + "/clf_whole/best.pt")
+MACH_PHOTON = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training/beam_parameters.json")
+PHOTON_ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/photon/training")
 CFG = {
     "photon_ct": dict(weights=f"{RUNS}/docker_extracted/photon_ct_docker.pt", label="docker:p2",
-                      cache=f"/home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24"),
+                      cache=f(os.environ.get("WORKDIR", "./workdir") + "/cache/crops/photon_skinentry_m24")),
     "photon_mri": dict(weights=f"{RUNS}/docker_extracted/photon_mri_docker.pt", label="docker:scheme2-p4",
-                       cache=f"/home/kaiwang/doserad2026_workdir/cache/crops/photon_skinentry_m24",
+                       cache=f(os.environ.get("WORKDIR", "./workdir") + "/cache/crops/photon_skinentry_m24"),
                        config="configs/experiments/all75/m24S2_p4_mmB.yaml"),
 }[TASK]
 os.environ["TORCHDYNAMO_DISABLE"] = "1"

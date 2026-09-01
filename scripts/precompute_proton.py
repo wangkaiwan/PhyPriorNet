@@ -7,6 +7,8 @@ Shardable across GPUs:  CUDA_VISIBLE_DEVICES=0 python ... --shard 0/2   (and 1/2
 Per beamlet npz: channels(4,d,h,w) fp16, dose(d,h,w) fp16, bbox int32[6], energy f32, dose_max f32.
 """
 from __future__ import annotations
+
+import os
 import argparse, json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pathlib import Path
@@ -17,8 +19,8 @@ from doserad.io.mha import load_mha
 from doserad.physics.machine import load_photon_machine
 from doserad.physics.proton_channels import proton_channels
 
-ROOT = "/data/kwang/DoseRad2026_raw/proton/training"
-MACHINE = "/data/kwang/DoseRad2026_raw/beam_parameters.json"
+ROOT = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/proton/training")
+MACHINE = (os.environ.get("DATA_ROOT", "/data/DoseRad2026_raw") + "/beam_parameters.json")
 MARGIN = 4
 THRESH = 0.01   # dose-region threshold (fraction of beamlet max) for the bbox
 
@@ -73,7 +75,7 @@ def process_patient(pid, out_root, machine, device):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out-dir", default="/home/kaiwang/doserad2026_workdir/cache/crops/proton")
+    ap.add_argument("--out-dir", default=(os.environ.get("WORKDIR", "./workdir") + "/cache/crops/proton"))
     ap.add_argument("--shard", default="0/1", help="i/N to process patient subset i of N")
     ap.add_argument("--pids", default=None, help="comma list to override")
     a = ap.parse_args()
