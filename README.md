@@ -50,6 +50,7 @@ and streaming writers — every speed lever gated to lose no accuracy.
 
 ```
 run_task.py   one-command training per task (chains all stages)
+examples/    smoke_test.py: synthetic-phantom installation check (CPU, no data needed)
 doserad/     core package: differentiable physics operators, DoseUNet3D, data pipeline
 accel/       deployment acceleration: batched proton engine v2, GPU channel builders
 container/   the four Grand-Challenge invoke containers (photon/proton × CT/MRI)
@@ -71,6 +72,12 @@ pip install -r requirements.txt      # or: pip install -e .[eval]
 Python >= 3.10, one CUDA GPU (>= 24 GB to train the base-48 networks; the released fast models
 run in ~5 GB). Scripts can be run from anywhere; they add the repository root to `sys.path`
 themselves.
+
+Verify the installation in one minute, without challenge data or a GPU:
+
+```bash
+python examples/smoke_test.py     # synthetic phantom -> physics channels -> network forward
+```
 
 ## Reproducing our results
 

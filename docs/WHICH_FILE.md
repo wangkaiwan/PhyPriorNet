@@ -5,6 +5,16 @@ and `configs/released/`. Everything else from the development campaign (about 14
 190 configs: ablations, probes, dead ends, one-off analyses) is preserved unedited under
 `archive/` for provenance; you do not need any of it to reproduce our results.
 
+## First: check the installation
+
+```bash
+python examples/smoke_test.py
+```
+
+Builds a synthetic phantom, runs the analytical physics operator and an untrained network on CPU,
+and prints channel ranges. If this passes, your environment is fine and any later failure is
+about data or configuration, not the install.
+
 ## Shortcut: one command per task
 
 If you do not want to think about stage order at all:
