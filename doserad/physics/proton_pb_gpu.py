@@ -268,6 +268,36 @@ def proton_pb_dose_gpu(image, ray_source, ray_target, energy, *, out_bbox,
     return dose.cpu().numpy().astype(np.float32)
 
 
+def ray_image_entry(origin, spacing, shape, src, axis, t_max):
+    """Distance along `src + t*axis` at which the ray first enters the image volume, or None if it
+    never does. Used to bound a skin search by the data rather than by a guessed window: there is no
+    body outside the image, so a march that starts here cannot miss an entry."""
+    nz, ny, nx = shape
+    lo = np.asarray(origin, np.float64)
+    hi = lo + np.array([(nx - 1) * spacing[0], (ny - 1) * spacing[1], (nz - 1) * spacing[2]])
+    lo, hi = np.minimum(lo, hi), np.maximum(lo, hi)
+    src = np.asarray(src, np.float64); axis = np.asarray(axis, np.float64)
+    t_lo, t_hi = 0.0, float(t_max)
+    for i in range(3):
+        if abs(axis[i]) < 1e-9:
+            if src[i] < lo[i] or src[i] > hi[i]:
+                return None
+            continue
+        t0 = (lo[i] - src[i]) / axis[i]
+        t1 = (hi[i] - src[i]) / axis[i]
+        t_lo = max(t_lo, min(t0, t1))
+        t_hi = min(t_hi, max(t0, t1))
+    return t_lo if t_hi > t_lo else None
+
+
+# Upstream extent of the SSD skin search, as a distance before isocentre. The shipped value was a
+# fixed 350 mm; a ray entering further back than that got the `sad` fallback, and `build_ray` then
+# began its WEPL raymarch at ssd-100 mm, i.e. inside the patient, which under-counts tissue and puts
+# the Bragg peak far too deep. `scripts/diag_proton_march_headroom.py` finds 11 training rays past
+# the window already. None means "back to the image boundary"; set DOSERAD_SSD_BACK_MM to pin it.
+SSD_BACK_MM = float(os.environ.get("DOSERAD_SSD_BACK_MM", "0")) or None
+
+
 def _compute_ssd(density, spacing, origin, src, axis, sad, dev, threshold=0.05, step_mm=1.0):
     """Source-to-surface distance: march along the central ray from the source, return the
     distance to the first sample with density > threshold (matches pyRadPlan skin SSD)."""
@@ -278,8 +308,15 @@ def _compute_ssd(density, spacing, origin, src, axis, sad, dev, threshold=0.05, 
     src_t = torch.as_tensor(src, dtype=torch.float32, device=dev)
     axis_t = torch.as_tensor(axis, dtype=torch.float32, device=dev)
 
-    # march only within a plausible window: from sad-300 to sad+300 mm (patient near iso)
-    t = torch.arange(sad - 350.0, sad + 50.0, step_mm, device=dev)
+    # March back to the image boundary, keeping the original sample phase so every point the shipped
+    # code sampled is still sampled at the same position: rays that already found their skin get a
+    # bit-identical SSD, and only rays that were falling off the window change.
+    t_start = sad - (SSD_BACK_MM or 350.0)
+    if SSD_BACK_MM is None:
+        t_enter = ray_image_entry(origin, spacing, density.shape, src, axis, sad + 50.0)
+        if t_enter is not None:
+            t_start -= np.ceil(max(t_start - t_enter, 0.0) / step_mm) * step_mm
+    t = torch.arange(t_start, sad + 50.0, step_mm, device=dev)
     pts = src_t.view(1, 3) + t.view(-1, 1) * axis_t.view(1, 3)          # (M,3)
     gx_ = (pts[:, 0] - ox) / max(sx * (nx - 1), 1e-6) * 2 - 1
     gy_ = (pts[:, 1] - oy) / max(sy * (ny - 1), 1e-6) * 2 - 1
