@@ -27,7 +27,7 @@ photon model computes a complete two-arc plan in under a minute, and a single se
 A proton beamlet is one energy-and-spot element; clinical spot maps contain thousands of them, so
 a full proton plan is several minutes at the per-element rates above, dominated by writing the
 per-beamlet dose volumes on the native 1x1x3 mm grid rather than by the network.
-Weight bundles are **available upon request** (contact kai.2.wang@cuanschutz.edu); each bundle contains the
+Weight bundles are **released at [v1.0-weights](https://github.com/wangkaiwan/PhyPriorNet/releases/tag/v1.0-weights)**; each bundle contains the
 network weights, the matching deploy config, `beam_parameters.json`, and `DEPLOY_ENV.txt` (the
 exact environment variables baked into the scored container). Weights were extracted from the
 exact Docker images that produced the leaderboard entries (image IDs available with the bundles).

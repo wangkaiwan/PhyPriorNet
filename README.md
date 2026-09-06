@@ -6,7 +6,8 @@ AMC_DoseCalc: Kai Wang (corresponding), Meixu Chen, Rui Yang — Department of R
 University of Colorado Anschutz Medical Campus.
 
 > Status: private until the challenge's public-release date.
-> **Model weights are available upon request**: contact Kai Wang (kai.2.wang@cuanschutz.edu).
+> **Model weights are released**: all eight bundles (quality + fast, four tasks) at
+> [Releases / v1.0-weights](https://github.com/wangkaiwan/PhyPriorNet/releases/tag/v1.0-weights). Non-commercial research use (trained on CC BY-NC 4.0 challenge data).
 > See [docs/MODEL_ZOO.md](docs/MODEL_ZOO.md) for the released versions and their metrics.
 
 ## The challenge
@@ -166,8 +167,9 @@ Code in this repository is licensed under the **GNU General Public License v3.0*
 [`LICENSE`](LICENSE)): free to use, modify and redistribute, provided derivative works are
 released under the same licence. For use under different terms, contact the corresponding author.
 
-Model weights are distributed **on request for non-commercial research use**
-(kai.2.wang@cuanschutz.edu); commercial use of the weights requires a separate agreement. They
+Model weights are released at [Releases / v1.0-weights](https://github.com/wangkaiwan/PhyPriorNet/releases/tag/v1.0-weights) for
+**non-commercial research use** (they were trained on CC BY-NC 4.0 challenge data); commercial use
+of the weights requires a separate agreement. They
 were trained on the DoseRAD2026 dataset, which is released under CC BY-NC 4.0; the dataset
 licence governs any use of the data, and this repository contains no challenge data.
 
