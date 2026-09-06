@@ -9,6 +9,8 @@ compute their own pencil-beam prior on GPU.
 
 ```bash
 # 1) Download a weight bundle from https://github.com/wangkaiwan/PhyPriorNet/releases/tag/v1.0-weights and unpack it
+#    (each bundle contains the model weights, beam_parameters.json and DEPLOY_ENV.txt -- nothing
+#     else is needed; build.sh will error if weights/ is missing beam_parameters.json)
 tar -xzf photonct_quality.tar.gz -C container/photon/weights/
 
 # 2) Apply the deployment environment of that version
